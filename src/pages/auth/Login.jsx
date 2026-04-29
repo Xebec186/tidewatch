@@ -1,7 +1,10 @@
 import { useState } from "react";
-import { LuEye, LuEyeOff, LuLock } from "react-icons/lu";
+import { LuEye, LuEyeOff, LuMail, LuLock } from "react-icons/lu";
 import { FcGoogle } from "react-icons/fc";
 import { Link, useNavigate } from "react-router-dom";
+import BackgroundGlow from "../../components/BackgroundGlow";
+import BrandHeader from "../../components/BrandHeader";
+import AuthFooter from "../../components/AuthFooter";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -16,43 +19,36 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-surface text-on-surface font-manrope flex flex-col">
       <main className="relative flex-1 overflow-hidden px-6 py-12 flex items-center justify-center">
-        <div className="pointer-events-none absolute top-[-10%] left-[-5%] h-[60%] w-[40%] rounded-full bg-primary/5 blur-[120px]" />
-        <div className="pointer-events-none absolute bottom-[-10%] right-[-5%] h-[70%] w-[50%] rounded-full bg-secondary-container/20 blur-[120px]" />
+        <BackgroundGlow />
 
         <div className="relative z-10 w-full max-w-110">
-          <div className="mb-10 text-center">
-            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary shadow-xl pb-1">
-              <span className="text-4xl text-on-primary">≋</span>
-            </div>
-            <h1 className="mb-2 text-3xl font-extrabold tracking-tight text-primary">
-              TideWatch
-            </h1>
-            <p className="text-sm font-medium text-on-surface-variant">
-              Fluid Intelligence Systems
-            </p>
-          </div>
-
+          <BrandHeader />
           <div className="rounded-2xl border border-white/60 bg-white/75 p-8 shadow-[0_8px_24px_rgba(23,28,31,0.06)] backdrop-blur-md md:p-10">
             <h2 className="mb-8 text-xl font-bold text-on-surface">
               Welcome back
             </h2>
 
             <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="space-y-2">
+              <div>
                 <label
                   htmlFor="email"
-                  className="ml-1 block text-sm font-semibold text-on-surface-variant"
+                  className="mb-2 ml-1 block text-xs font-bold uppercase tracking-widest text-on-surface-variant"
                 >
                   Email Address
                 </label>
-                <input
-                  id="email"
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  placeholder="someone@example.com"
-                  className="w-full rounded-xl border border-transparent bg-surface-container-highest px-4 py-3 text-on-surface placeholder:text-outline focus:border-primary focus:outline-none focus:ring-0"
-                />
+                <div className="relative">
+                  <LuMail className="absolute left-4 top-1/2 -translate-y-1/2 text-outline/50" />
+                  <input
+                    id="email"
+                    type="email"
+                    value={form.email}
+                    onChange={(e) =>
+                      setForm({ ...form, email: e.target.value })
+                    }
+                    placeholder="someone@example.com"
+                    className="w-full rounded-xl border-none bg-surface-container-low py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/40 focus:ring-2 focus:ring-primary focus:outline-none"
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -72,6 +68,7 @@ export default function Login() {
                 </div>
 
                 <div className="relative">
+                  <LuLock className="absolute left-4 top-1/2 -translate-y-1/2 text-outline/50" />
                   <input
                     id="password"
                     type={showPassword ? "text" : "password"}
@@ -80,20 +77,20 @@ export default function Login() {
                       setForm({ ...form, password: e.target.value })
                     }
                     placeholder="••••••••"
-                    className="w-full rounded-xl border border-transparent bg-surface-container-highest px-4 py-3 pr-12 text-on-surface placeholder:text-outline focus:border-primary focus:outline-none focus:ring-0"
+                    className="w-full rounded-xl border-none bg-surface-container-low py-3.5 pl-12 pr-12 text-on-surface placeholder:text-outline/40 focus:ring-2 focus:ring-primary focus:outline-none"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword((prev) => !prev)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary cursor-pointer"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-outline/50 transition-colors hover:text-primary"
                     aria-label={
                       showPassword ? "Hide password" : "Show password"
                     }
                   >
                     {showPassword ? (
-                      <LuEyeOff size={20} />
+                      <LuEyeOff size={18} />
                     ) : (
-                      <LuEye size={20} />
+                      <LuEye size={18} />
                     )}
                   </button>
                 </div>
@@ -139,12 +136,7 @@ export default function Login() {
             </div>
           </div>
 
-          <div className="mt-8 flex items-center justify-center gap-2 opacity-60">
-            <LuLock size={14} />
-            <span className="text-xs font-bold uppercase tracking-widest text-neutral">
-              End-to-end encrypted telemetry
-            </span>
-          </div>
+          <AuthFooter />
         </div>
       </main>
     </div>

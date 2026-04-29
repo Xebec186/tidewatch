@@ -2,6 +2,9 @@ import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { LuEye, LuEyeOff, LuLock, LuMail, LuUser } from "react-icons/lu";
 import { Link, useNavigate } from "react-router-dom";
+import BackgroundGlow from "../../components/BackgroundGlow";
+import BrandHeader from "../../components/BrandHeader";
+import AuthFooter from "../../components/AuthFooter";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -23,25 +26,12 @@ export default function Signup() {
 
   return (
     <div className="min-h-screen bg-surface text-on-surface font-manrope flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden">
-      <div className="fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] h-[40%] w-[40%] rounded-full bg-primary-fixed-dim/20 blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] h-[50%] w-[50%] rounded-full bg-tertiary-fixed-dim/10 blur-[150px]" />
-      </div>
+      <BackgroundGlow />
 
-      <main className="w-full max-w-[480px]">
-        <div className="mb-10 text-center">
-          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary shadow-xl">
-            <span className="text-3xl text-on-primary">≋</span>
-          </div>
-          <h1 className="mb-2 text-3xl font-extrabold tracking-tight text-primary">
-            TideWatch
-          </h1>
-          <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-on-surface-variant">
-            Fluid Intelligence Systems
-          </p>
-        </div>
+      <main className="w-full max-w-120">
+        <BrandHeader />
 
-        <section className="rounded-[2rem] bg-surface-container-lowest/90 p-8 shadow-[0_8px_24px_rgba(23,28,31,0.06)] backdrop-blur-xl transition-all duration-300 md:p-10">
+        <section className="rounded-4xl bg-surface-container-lowest/90 p-8 shadow-[0_8px_24px_rgba(23,28,31,0.06)] backdrop-blur-xl transition-all duration-300 md:p-10">
           <div className="mb-8">
             <h2 className="mb-2 text-2xl font-bold text-on-surface">
               Create an account
@@ -61,11 +51,11 @@ export default function Signup() {
           </button>
 
           <div className="relative my-8 flex items-center">
-            <div className="flex-grow border-t border-outline-variant/30" />
+            <div className="grow border-t border-outline-variant/30" />
             <span className="mx-4 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">
               or use email
             </span>
-            <div className="flex-grow border-t border-outline-variant/30" />
+            <div className="grow border-t border-outline-variant/30" />
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -105,7 +95,7 @@ export default function Signup() {
                   type="email"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  placeholder="name@company.com"
+                  placeholder="someone@example.com"
                   className="w-full rounded-xl border-none bg-surface-container-low py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/40 focus:ring-2 focus:ring-primary focus:outline-none"
                 />
               </div>
@@ -244,27 +234,7 @@ export default function Signup() {
             </Link>
           </p>
         </section>
-
-        <footer className="mt-12 text-center">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">
-            © {new Date().getFullYear()} TideWatch IoT. Fluid Intelligence
-            Systems.
-          </p>
-          <div className="mt-4 flex justify-center gap-6">
-            <a
-              href="#"
-              className="text-[10px] uppercase tracking-widest text-slate-400 transition-colors hover:text-primary"
-            >
-              Privacy Policy
-            </a>
-            <a
-              href="#"
-              className="text-[10px] uppercase tracking-widest text-slate-400 transition-colors hover:text-primary"
-            >
-              Terms of Service
-            </a>
-          </div>
-        </footer>
+        <AuthFooter />
       </main>
     </div>
   );
