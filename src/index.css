@@ -1,0 +1,65 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --font-manrope: "Manrope", sans-serif;
+
+  --color-on-background: #171c1f;
+  --color-on-secondary-container: #526772;
+  --color-surface-container-low: #eff4f8;
+  --color-surface-container-high: #e3e9ec;
+  --color-on-primary: #ffffff;
+  --color-on-error-container: #93000a;
+  --color-primary-fixed: #adecff;
+  --color-outline: #6f797c;
+  --color-inverse-primary: #8cd1e4;
+  --color-on-error: #ffffff;
+  --color-on-primary-fixed-variant: #004e5d;
+  --color-surface-variant: #dee3e7;
+  --color-primary: #004451;
+  --color-on-secondary: #ffffff;
+  --color-inverse-surface: #2b3134;
+  --color-error-container: #ffdad6;
+  --color-tertiary-fixed-dim: #99cfdc;
+  --color-surface: #f5fafe;
+  --color-inverse-on-surface: #ecf1f5;
+  --color-background: #f5fafe;
+  --color-on-secondary-fixed-variant: #354a53;
+  --color-secondary-container: #cfe6f2;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-fixed: #b4ecf8;
+  --color-on-surface: #171c1f;
+  --color-tertiary-container: #225c67;
+  --color-secondary: #4c616b;
+  --color-on-tertiary-container: #9bd2df;
+  --color-on-primary-fixed: #001f26;
+  --color-surface-bright: #f5fafe;
+  --color-surface-container-highest: #dee3e7;
+  --color-on-tertiary-fixed-variant: #0e4e58;
+  --color-surface-dim: #d5dbde;
+  --color-secondary-fixed-dim: #b4cad5;
+  --color-on-tertiary-fixed: #001f25;
+  --color-outline-variant: #bfc8cb;
+  --color-tertiary: #00444e;
+  --color-primary-fixed-dim: #8cd1e4;
+  --color-primary-container: #005d6e;
+  --color-secondary-fixed: #cfe6f2;
+  --color-on-surface-variant: #3f484b;
+  --color-on-secondary-fixed: #081e27;
+  --color-surface-tint: #176778;
+  --color-on-primary-container: #8fd4e7;
+  --color-error: #ba1a1a;
+  --color-surface-container: #e9eff2;
+  --color-surface-container-lowest: #ffffff;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: "Manrope", sans-serif;
+  background: var(--color-background);
+}
