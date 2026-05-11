@@ -123,7 +123,7 @@ function MetricCard({ label, value, helper, icon: Icon }) {
   );
 }
 
-export default function RegularUserDashboard() {
+export default function RegularDashboard() {
   return (
     <div className="min-h-screen bg-surface text-on-surface font-manrope selection:bg-primary-container selection:text-on-primary-container">
       <header className="sticky top-0 z-40 border-b border-outline-variant/20 bg-surface/85 backdrop-blur-md">
