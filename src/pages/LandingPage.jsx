@@ -1,141 +1,15 @@
 import { Link } from "react-router-dom";
-import {
-  LuArrowRight,
-  LuBellRing,
-  LuShieldCheck,
-  LuWifi,
-  LuGauge,
-  LuMenu,
-  LuBadgeInfo,
-} from "react-icons/lu";
-import { FiBarChart } from "react-icons/fi";
+import { LuArrowRight, LuBellRing, LuBadgeInfo } from "react-icons/lu";
 import { SiArduino } from "react-icons/si";
-import { MdWaves } from "react-icons/md";
-
-const stats = [
-  { value: "24/7", label: "monitoring" },
-  { value: "Real-time", label: "alerts" },
-  { value: "Low-cost", label: "deployment" },
-  { value: "IoT-ready", label: "architecture" },
-];
-
-const features = [
-  {
-    icon: LuBellRing,
-    title: "Instant alerts",
-    description:
-      "Receive threshold-based warnings through connected notifications when tide levels become unsafe.",
-  },
-  {
-    icon: FiBarChart,
-    title: "Live readings",
-    description:
-      "Track tide measurements, patterns, and system status in a clean dashboard built for clarity.",
-  },
-  {
-    icon: LuShieldCheck,
-    title: "Reliable monitoring",
-    description:
-      "Designed for coastal safety, education, and small-scale deployments where affordable monitoring matters.",
-  },
-  {
-    icon: LuWifi,
-    title: "Connected system",
-    description:
-      "The proposal supports Wi-Fi and alert delivery so data can reach the right people quickly.",
-  },
-  {
-    icon: LuGauge,
-    title: "Threshold control",
-    description:
-      "Technical users can manage alert limits, device settings, and operational checks from the system.",
-  },
-  {
-    icon: SiArduino,
-    title: "Sensor-driven",
-    description:
-      "Built around an Arduino-based tide gauge concept using accessible components and practical deployment.",
-  },
-];
-
-const audience = [
-  {
-    title: "Regular users",
-    text: "People who simply need to view tide status, understand alerts, and stay informed without changing system settings.",
-  },
-  {
-    title: "Technical users",
-    text: "Operators, admins, or engineers who configure sensors, monitor device health, review data, and manage thresholds.",
-  },
-];
+import { features } from "../data/features";
+import { stats } from "../data/stats";
+import { audience } from "../data/audience";
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-surface text-on-surface font-manrope selection:bg-primary-container selection:text-on-primary-container">
-      <header className="sticky top-0 z-50 border-b border-outline-variant/20 bg-surface/85 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <Link to="/" className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-on-primary shadow-lg shadow-primary/10">
-              <MdWaves size={20} />
-            </div>
-            <div>
-              <p className="text-lg font-extrabold tracking-tight text-primary">
-                TideWatch
-              </p>
-              <p className="text-[10px] uppercase tracking-[0.24em] text-on-surface-variant">
-                Fluid Intelligence Systems
-              </p>
-            </div>
-          </Link>
-
-          <nav className="hidden items-center gap-8 md:flex">
-            <a
-              href="#features"
-              className="text-sm font-medium text-on-surface-variant transition-colors hover:text-primary"
-            >
-              Features
-            </a>
-            <a
-              href="#audience"
-              className="text-sm font-medium text-on-surface-variant transition-colors hover:text-primary"
-            >
-              Users
-            </a>
-            <a
-              href="#cta"
-              className="text-sm font-medium text-on-surface-variant transition-colors hover:text-primary"
-            >
-              Get Started
-            </a>
-          </nav>
-
-          <div className="flex items-center gap-3">
-            <Link
-              to="/login"
-              className="hidden rounded-xl px-4 py-2 text-sm font-semibold text-on-surface-variant transition-colors hover:text-primary sm:inline-flex"
-            >
-              Log In
-            </Link>
-            <Link
-              to="/signup"
-              className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-on-primary shadow-lg shadow-primary/10 transition-all hover:bg-primary-container active:scale-[0.98]"
-            >
-              Sign Up
-              <LuArrowRight size={16} />
-            </Link>
-            <button
-              type="button"
-              className="inline-flex cursor-pointer items-center justify-center rounded-xl p-2 text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-primary md:hidden"
-              aria-label="Open menu"
-            >
-              <LuMenu size={22} />
-            </button>
-          </div>
-        </div>
-      </header>
-
       <main className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_2px_2px,rgba(0,68,81,0.05)_1px,transparent_0)] [background-size:40px_40px] opacity-60" />
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_2px_2px,rgba(0,68,81,0.05)_1px,transparent_0)] bg-size-[40px_40px] opacity-60" />
         <div className="pointer-events-none absolute -top-24 -right-24 h-96 w-96 rounded-full bg-primary/5 blur-3xl" />
         <div className="pointer-events-none absolute top-1/2 -left-48 h-96 w-96 rounded-full bg-tertiary/5 blur-3xl" />
 
@@ -354,8 +228,8 @@ export default function LandingPage() {
         </section>
 
         <section id="cta" className="px-6 pb-32 pt-6">
-          <div className="relative mx-auto max-w-5xl overflow-hidden rounded-[2rem] bg-primary">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-tertiary opacity-95" />
+          <div className="relative mx-auto max-w-5xl overflow-hidden rounded-4xl bg-primary">
+            <div className="absolute inset-0 bg-linear-to-br from-primary via-primary to-tertiary opacity-95" />
             <div className="relative z-10 px-8 py-16 text-center md:px-16 md:py-24">
               <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-on-primary/80">
                 Ready to deploy
@@ -378,43 +252,13 @@ export default function LandingPage() {
                   to="/login"
                   className="inline-flex cursor-pointer items-center justify-center rounded-xl border-2 border-on-primary/20 px-8 py-4 font-extrabold text-on-primary transition-colors hover:bg-on-primary/10"
                 >
-                  View Login
+                  Login
                 </Link>
               </div>
             </div>
           </div>
         </section>
       </main>
-
-      <footer className="border-t border-outline-variant/20 bg-surface-container-low py-12">
-        <div className="mx-auto flex max-w-7xl flex-col gap-8 px-6 md:flex-row md:items-start md:justify-between">
-          <div className="max-w-sm">
-            <p className="text-lg font-black tracking-tight text-primary">
-              TideWatch
-            </p>
-            <p className="mt-3 text-xs uppercase tracking-[0.22em] text-on-surface-variant">
-              © 2024 TideWatch IoT. Fluid Intelligence Systems.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-x-8 gap-y-4 md:justify-end">
-            {[
-              "Privacy Policy",
-              "Terms of Service",
-              "API Documentation",
-              "Contact Support",
-            ].map((item) => (
-              <a
-                key={item}
-                href="#"
-                className="text-xs uppercase tracking-widest text-on-surface-variant underline-offset-4 transition-colors hover:text-primary hover:underline"
-              >
-                {item}
-              </a>
-            ))}
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
