@@ -1,7 +1,19 @@
-import { Link } from "react-router-dom";
-import { LuWaves, LuBellRing, LuCircleUser } from "react-icons/lu";
+import { Link, useNavigate } from "react-router-dom";
+import { LuWaves, LuBellRing, LuCircleUser, LuLogOut } from "react-icons/lu";
+import { useAuth } from "../context/AuthContext";
 
 export default function TechnicalDashboardNavbar() {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/");
+    } catch (err) {
+      console.error("Failed to log out", err);
+    }
+  };
   return (
     <header className="sticky top-0 z-50 border-b border-outline-variant/20 bg-surface/85 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
@@ -57,12 +69,20 @@ export default function TechnicalDashboardNavbar() {
           <Link to="/profile">
             <button
               type="button"
-              className="inline-flex cursor-pointer items-center justify-center rounded-xl p-2 text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-primary md:hidden"
-              aria-label="Menu"
+              className="inline-flex cursor-pointer items-center justify-center rounded-xl p-2 text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-primary"
+              aria-label="Profile"
             >
               <LuCircleUser size={20} />
             </button>
           </Link>
+          <button
+            onClick={handleLogout}
+            type="button"
+            className="inline-flex cursor-pointer items-center justify-center rounded-xl p-2 text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-error"
+            aria-label="Logout"
+          >
+            <LuLogOut size={20} />
+          </button>
         </div>
       </div>
     </header>

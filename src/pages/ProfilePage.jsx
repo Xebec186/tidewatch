@@ -1,3 +1,4 @@
+import { useAuth } from "../context/AuthContext";
 import {
   LuBellRing,
   LuChevronRight,
@@ -68,6 +69,7 @@ function PasswordRequirement({ text, done = false }) {
 }
 
 export default function ProfilePage() {
+  const { user } = useAuth();
   return (
     <div className="min-h-screen bg-surface text-on-surface font-manrope selection:bg-primary-container selection:text-on-primary-container">
       <main className="mx-auto max-w-7xl px-6 py-8 md:py-10">
@@ -106,14 +108,14 @@ export default function ProfilePage() {
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <h2 className="text-3xl font-bold tracking-tight text-primary">
-                        Glenn Rogers
+                        {user?.displayName || "TideWatch User"}
                       </h2>
                       <span className="rounded-full bg-tertiary-container/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-primary">
-                        Technical User
+                        {user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : "User"} Role
                       </span>
                     </div>
                     <p className="mt-2 text-sm text-on-surface-variant">
-                      glenn.rogers@tidewatch.system
+                      {user?.email}
                     </p>
                   </div>
                 </div>

@@ -24,7 +24,6 @@ import {
   Bar,
   Legend,
 } from "recharts";
-import TechnicalDashboardNavbar from "../../components/TechnicalDashboardNavbar";
 
 const telemetryData = [
   { time: "13:00", level: 2.18, distance: 169.2, battery: 3.89 },
@@ -166,7 +165,6 @@ function MetricCard({ label, value, helper, icon: Icon, tone = "default" }) {
 export default function TechnicalDashboard() {
   return (
     <div className="min-h-screen bg-surface text-on-surface font-manrope selection:bg-primary-fixed selection:text-on-primary-fixed">
-      <TechnicalDashboardNavbar />
       <main className="mx-auto max-w-7xl px-6 py-8 md:py-10">
         <section className="mb-10 grid gap-8 lg:grid-cols-12">
           <div className="lg:col-span-8">

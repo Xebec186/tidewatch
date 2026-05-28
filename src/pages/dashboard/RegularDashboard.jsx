@@ -18,7 +18,6 @@ import {
   AreaChart,
   Area,
 } from "recharts";
-import RegularDashboardNavbar from "../../components/RegularDashboardNavbar";
 
 const tideData = [
   { time: "06:00", tide: 1.9 },
@@ -125,8 +124,6 @@ function MetricCard({ label, value, helper, icon: Icon }) {
 export default function RegularDashboard() {
   return (
     <div className="min-h-screen bg-surface text-on-surface font-manrope selection:bg-primary-container selection:text-on-primary-container">
-      <RegularDashboardNavbar />
-
       <main className="mx-auto max-w-7xl px-6 py-8 md:py-10">
         <section id="overview" className="mb-10 grid gap-8 lg:grid-cols-12">
           <div className="lg:col-span-8">

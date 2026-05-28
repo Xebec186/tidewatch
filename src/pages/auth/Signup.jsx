@@ -5,12 +5,16 @@ import { Link, useNavigate } from "react-router-dom";
 import BackgroundGlow from "../../components/BackgroundGlow";
 import BrandHeader from "../../components/BrandHeader";
 import AuthFooter from "../../components/AuthFooter";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Signup() {
   const navigate = useNavigate();
+  const { signup } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [role, setRole] = useState("regular");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
     fullName: "",
@@ -19,9 +23,27 @@ export default function Signup() {
     confirmPassword: "",
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate("/dashboard");
+    
+    if (form.password !== form.confirmPassword) {
+      return setError("Passwords do not match");
+    }
+
+    setError("");
+    setLoading(true);
+    try {
+      await signup(form.email, form.password, {
+        fullName: form.fullName,
+        role: role,
+      });
+      navigate("/dashboard");
+    } catch (err) {
+      console.error(err);
+      setError("Failed to create an account. " + err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -41,6 +63,12 @@ export default function Signup() {
               keep the system running smoothly.
             </p>
           </div>
+
+          {error && (
+            <div className="mb-6 rounded-lg bg-error-container p-4 text-sm text-on-error-container">
+              {error}
+            </div>
+          )}
 
           <button
             type="button"
@@ -71,6 +99,7 @@ export default function Signup() {
                 <input
                   id="fullName"
                   type="text"
+                  required
                   value={form.fullName}
                   onChange={(e) =>
                     setForm({ ...form, fullName: e.target.value })
@@ -93,6 +122,7 @@ export default function Signup() {
                 <input
                   id="email"
                   type="email"
+                  required
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   placeholder="someone@example.com"
@@ -158,6 +188,7 @@ export default function Signup() {
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
+                  required
                   value={form.password}
                   onChange={(e) =>
                     setForm({ ...form, password: e.target.value })
@@ -188,6 +219,7 @@ export default function Signup() {
                 <input
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
+                  required
                   value={form.confirmPassword}
                   onChange={(e) =>
                     setForm({ ...form, confirmPassword: e.target.value })
@@ -217,9 +249,10 @@ export default function Signup() {
             <div className="pt-2">
               <button
                 type="submit"
-                className="w-full cursor-pointer rounded-xl bg-primary py-4 font-bold text-on-primary shadow-lg shadow-primary/20 transition-all duration-300 hover:brightness-110 active:scale-[0.99]"
+                disabled={loading}
+                className="w-full cursor-pointer rounded-xl bg-primary py-4 font-bold text-on-primary shadow-lg shadow-primary/20 transition-all duration-300 hover:brightness-110 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Create Account
+                {loading ? "Creating Account..." : "Create Account"}
               </button>
             </div>
           </form>

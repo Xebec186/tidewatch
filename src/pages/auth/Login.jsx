@@ -5,15 +5,29 @@ import { Link, useNavigate } from "react-router-dom";
 import BackgroundGlow from "../../components/BackgroundGlow";
 import BrandHeader from "../../components/BrandHeader";
 import AuthFooter from "../../components/AuthFooter";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate("/dashboard");
+    setError("");
+    setLoading(true);
+    try {
+      await login(form.email, form.password);
+      navigate("/dashboard");
+    } catch (err) {
+      console.error(err);
+      setError("Failed to sign in. Please check your credentials.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -28,6 +42,12 @@ export default function Login() {
               Welcome back
             </h2>
 
+            {error && (
+              <div className="mb-6 rounded-lg bg-error-container p-4 text-sm text-on-error-container">
+                {error}
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label
@@ -41,6 +61,7 @@ export default function Login() {
                   <input
                     id="email"
                     type="email"
+                    required
                     value={form.email}
                     onChange={(e) =>
                       setForm({ ...form, email: e.target.value })
@@ -72,6 +93,7 @@ export default function Login() {
                   <input
                     id="password"
                     type={showPassword ? "text" : "password"}
+                    required
                     value={form.password}
                     onChange={(e) =>
                       setForm({ ...form, password: e.target.value })
@@ -98,9 +120,10 @@ export default function Login() {
 
               <button
                 type="submit"
-                className="mt-2 w-full rounded-xl bg-primary py-4 font-bold text-on-primary shadow-lg shadow-primary/10 cursor-pointer transition-all hover:bg-primary/90 active:scale-[0.98]"
+                disabled={loading}
+                className="mt-2 w-full rounded-xl bg-primary py-4 font-bold text-on-primary shadow-lg shadow-primary/10 cursor-pointer transition-all hover:bg-primary/90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Sign In
+                {loading ? "Signing In..." : "Sign In"}
               </button>
 
               <div className="relative py-4">

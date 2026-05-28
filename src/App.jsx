@@ -11,6 +11,7 @@ import ProfilePage from "./pages/ProfilePage";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import ContactSupport from "./pages/ContactSupport";
+import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 import "./App.css";
 
@@ -34,9 +35,11 @@ function App() {
             <Route path="/support" element={<ContactSupport />} />
           </Route>
 
-          <Route element={<DashboardLayout />}>
-            <Route path="/dashboard" element={<DashboardRouter />} />
-            <Route path="/profile" element={<ProfilePage />} />
+          <Route element={<ProtectedRoute />}>
+            <Route element={<DashboardLayout />}>
+              <Route path="/dashboard" element={<DashboardRouter />} />
+              <Route path="/profile" element={<ProfilePage />} />
+            </Route>
           </Route>
 
           <Route path="*" element={<h1>404 Not Found</h1>} />
