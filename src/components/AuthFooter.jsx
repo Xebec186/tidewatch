@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export default function AuthFooter() {
   return (
     <footer className="mt-12 text-center">
@@ -5,18 +7,18 @@ export default function AuthFooter() {
         © {new Date().getFullYear()} TideWatch IoT. Fluid Intelligence Systems.
       </p>
       <div className="mt-4 flex justify-center gap-6">
-        <a
-          href="#"
+        <Link
+          to="/privacy"
           className="text-[10px] uppercase tracking-widest text-slate-400 transition-colors hover:text-primary"
         >
           Privacy Policy
-        </a>
-        <a
-          href="#"
+        </Link>
+        <Link
+          to="/terms"
           className="text-[10px] uppercase tracking-widest text-slate-400 transition-colors hover:text-primary"
         >
           Terms of Service
-        </a>
+        </Link>
       </div>
     </footer>
   );

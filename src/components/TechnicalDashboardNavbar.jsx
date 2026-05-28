@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { LuWaves, LuBellRing, LuMenu } from "react-icons/lu";
+import { LuWaves, LuBellRing, LuCircleUser } from "react-icons/lu";
 
 export default function TechnicalDashboardNavbar() {
   return (
@@ -54,13 +54,15 @@ export default function TechnicalDashboardNavbar() {
           >
             <LuBellRing size={20} />
           </button>
-          <button
-            type="button"
-            className="inline-flex cursor-pointer items-center justify-center rounded-xl p-2 text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-primary md:hidden"
-            aria-label="Menu"
-          >
-            <LuMenu size={20} />
-          </button>
+          <Link to="/profile">
+            <button
+              type="button"
+              className="inline-flex cursor-pointer items-center justify-center rounded-xl p-2 text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-primary md:hidden"
+              aria-label="Menu"
+            >
+              <LuCircleUser size={20} />
+            </button>
+          </Link>
         </div>
       </div>
     </header>

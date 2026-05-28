@@ -13,7 +13,7 @@ export default function LandingPage() {
         <div className="pointer-events-none absolute -top-24 -right-24 h-96 w-96 rounded-full bg-primary/5 blur-3xl" />
         <div className="pointer-events-none absolute top-1/2 -left-48 h-96 w-96 rounded-full bg-tertiary/5 blur-3xl" />
 
-        <section className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-14 px-6 pb-24 pt-20 lg:grid-cols-12 lg:pt-24">
+        <section className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-14 px-6 pb-24 pt-10 lg:grid-cols-12">
           <div className="lg:col-span-7">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-secondary-container px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-on-secondary-fixed-variant">
               <span className="h-2 w-2 rounded-full bg-primary" />
