@@ -1,10 +1,8 @@
-import { Link } from "react-router-dom";
 import {
   LuArrowRight,
   LuBellRing,
   LuClock3,
   LuGauge,
-  LuMapPin,
   LuShieldCheck,
   LuSignal,
   LuWaves,
@@ -20,6 +18,7 @@ import {
   AreaChart,
   Area,
 } from "recharts";
+import RegularDashboardNavbar from "../../components/RegularDashboardNavbar";
 
 const tideData = [
   { time: "06:00", tide: 1.9 },
@@ -126,58 +125,7 @@ function MetricCard({ label, value, helper, icon: Icon }) {
 export default function RegularDashboard() {
   return (
     <div className="min-h-screen bg-surface text-on-surface font-manrope selection:bg-primary-container selection:text-on-primary-container">
-      <header className="sticky top-0 z-40 border-b border-outline-variant/20 bg-surface/85 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <Link to="/dashboard" className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-on-primary shadow-lg shadow-primary/10">
-              <LuWaves size={20} />
-            </div>
-            <div>
-              <p className="text-lg font-extrabold tracking-tight text-primary">
-                TideWatch
-              </p>
-              <p className="text-[10px] uppercase tracking-[0.22em] text-on-surface-variant">
-                Regular User View
-              </p>
-            </div>
-          </Link>
-
-          <nav className="hidden items-center gap-8 md:flex">
-            <a href="#overview" className="text-sm font-medium text-primary">
-              Overview
-            </a>
-            <a
-              href="#charts"
-              className="text-sm font-medium text-on-surface-variant transition-colors hover:text-primary"
-            >
-              Charts
-            </a>
-            <a
-              href="#alerts"
-              className="text-sm font-medium text-on-surface-variant transition-colors hover:text-primary"
-            >
-              Alerts
-            </a>
-          </nav>
-
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-secondary-container px-4 py-2.5 text-sm font-bold text-primary transition-colors hover:bg-surface-container-highest"
-            >
-              <LuMapPin size={16} />
-              Harbor Gate
-            </button>
-            <button
-              type="button"
-              className="inline-flex cursor-pointer items-center justify-center rounded-xl p-2 text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-primary"
-              aria-label="Notifications"
-            >
-              <LuBellRing size={20} />
-            </button>
-          </div>
-        </div>
-      </header>
+      <RegularDashboardNavbar />
 
       <main className="mx-auto max-w-7xl px-6 py-8 md:py-10">
         <section id="overview" className="mb-10 grid gap-8 lg:grid-cols-12">
