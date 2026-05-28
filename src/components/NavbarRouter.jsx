@@ -2,15 +2,15 @@ import { useAuth } from "../context/AuthContext";
 import RegularDashboardNavbar from "./RegularDashboardNavbar";
 import TechnicalDashboardNavbar from "./TechnicalDashboardNavbar";
 
-export default function NavbarRouter() {
+export default function NavbarRouter({ onNotificationToggle }) {
   const { user } = useAuth();
 
-  switch (user.role) {
+  switch (user?.role) {
     case "regular":
-      return <RegularDashboardNavbar />;
+      return <RegularDashboardNavbar onNotificationToggle={onNotificationToggle} />;
 
     case "technical":
-      return <TechnicalDashboardNavbar />;
+      return <TechnicalDashboardNavbar onNotificationToggle={onNotificationToggle} />;
     default:
       return "";
   }

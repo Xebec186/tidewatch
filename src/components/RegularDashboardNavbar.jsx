@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { LuWaves, LuBellRing, LuCircleUser, LuLogOut } from "react-icons/lu";
 import { useAuth } from "../context/AuthContext";
 
-export default function RegularDashboardNavbar() {
+export default function RegularDashboardNavbar({ onNotificationToggle }) {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -14,6 +14,13 @@ export default function RegularDashboardNavbar() {
       console.error("Failed to log out", err);
     }
   };
+
+  const handleNotifClick = (e) => {
+    e.preventDefault();
+    console.log("Notification button clicked");
+    if (onNotificationToggle) onNotificationToggle();
+  };
+
   return (
     <header className="sticky top-0 z-40 border-b border-outline-variant/20 bg-surface/85 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
@@ -32,17 +39,17 @@ export default function RegularDashboardNavbar() {
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
-          <a href="#overview" className="text-sm font-medium text-primary">
+          <a href="/dashboard#overview" className="text-sm font-medium text-primary">
             Overview
           </a>
           <a
-            href="#charts"
+            href="/dashboard#charts"
             className="text-sm font-medium text-on-surface-variant transition-colors hover:text-primary"
           >
             Charts
           </a>
           <a
-            href="#alerts"
+            href="/dashboard#alerts"
             className="text-sm font-medium text-on-surface-variant transition-colors hover:text-primary"
           >
             Alerts
@@ -60,6 +67,7 @@ export default function RegularDashboardNavbar() {
             </span>
           </div>
           <button
+            onClick={handleNotifClick}
             type="button"
             className="inline-flex cursor-pointer items-center justify-center rounded-xl p-2 text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-primary"
             aria-label="Notifications"

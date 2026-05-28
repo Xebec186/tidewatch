@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { LuWaves, LuBellRing, LuCircleUser, LuLogOut } from "react-icons/lu";
 import { useAuth } from "../context/AuthContext";
 
-export default function TechnicalDashboardNavbar() {
+export default function TechnicalDashboardNavbar({ onNotificationToggle }) {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -14,10 +14,17 @@ export default function TechnicalDashboardNavbar() {
       console.error("Failed to log out", err);
     }
   };
+
+  const handleNotifClick = (e) => {
+    e.preventDefault();
+    console.log("Technical notification button clicked");
+    if (onNotificationToggle) onNotificationToggle();
+  };
+
   return (
     <header className="sticky top-0 z-50 border-b border-outline-variant/20 bg-surface/85 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-        <Link to="/technical-dashboard" className="flex items-center gap-3">
+        <Link to="/dashboard" className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-on-primary shadow-lg shadow-primary/10">
             <LuWaves size={20} />
           </div>
@@ -32,17 +39,17 @@ export default function TechnicalDashboardNavbar() {
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
-          <a href="#analytics" className="text-sm font-medium text-primary">
+          <a href="/dashboard#analytics" className="text-sm font-medium text-primary">
             Analytics
           </a>
           <a
-            href="#logs"
+            href="/dashboard#logs"
             className="text-sm font-medium text-on-surface-variant transition-colors hover:text-primary"
           >
             Logs
           </a>
           <a
-            href="#history"
+            href="/dashboard#history"
             className="text-sm font-medium text-on-surface-variant transition-colors hover:text-primary"
           >
             History
@@ -60,6 +67,7 @@ export default function TechnicalDashboardNavbar() {
             </span>
           </div>
           <button
+            onClick={handleNotifClick}
             type="button"
             className="inline-flex cursor-pointer items-center justify-center rounded-xl p-2 text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-primary"
             aria-label="Notifications"
