@@ -11,9 +11,11 @@ export default function Navbar() {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   return (
-    <header className={`sticky top-0 z-50 border-b border-outline-variant/20 transition-colors duration-300 ${
-      isMenuOpen ? "bg-surface" : "bg-surface/85 backdrop-blur-md"
-    }`}>
+    <header
+      className={`sticky top-0 z-50 border-b border-outline-variant/20 transition-colors duration-300 ${
+        isMenuOpen ? "bg-surface" : "bg-surface/85 backdrop-blur-md"
+      }`}
+    >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <Link to="/" className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-on-primary shadow-lg shadow-primary/10">
@@ -91,9 +93,9 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       <div
-        className={`fixed inset-x-0 top-[73px] bottom-0 z-40 bg-surface shadow-2xl transition-all duration-300 md:hidden ${
-          isMenuOpen 
-            ? "translate-y-0 opacity-100" 
+        className={`fixed inset-x-0 top-19 bottom-0 z-40 bg-surface shadow-2xl transition-all duration-300 md:hidden ${
+          isMenuOpen
+            ? "translate-y-0 opacity-100"
             : "-translate-y-4 opacity-0 pointer-events-none"
         }`}
       >

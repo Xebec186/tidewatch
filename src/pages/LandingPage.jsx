@@ -142,7 +142,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="features" className="bg-surface-container-low py-24">
+        <section id="features" className="bg-surface-container-low py-12">
           <div className="mx-auto max-w-7xl px-6">
             <div className="mb-16 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
               <div className="max-w-3xl">
@@ -156,7 +156,7 @@ export default function LandingPage() {
                   The proposal describes a low-cost tide gauge with alerts, so
                   the landing page emphasizes live monitoring, accessible
                   components, and a system that can serve both community and
-                  technical use cases. fileciteturn0file0
+                  technical use cases.
                 </p>
               </div>
               <div className="hidden text-right lg:block">
