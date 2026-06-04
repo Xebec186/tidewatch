@@ -20,7 +20,7 @@ export default function LandingPage() {
               System status: active
             </div>
 
-            <h1 className="max-w-3xl text-5xl font-extrabold tracking-tight text-primary md:text-6xl lg:text-7xl">
+            <h1 className="max-w-3xl text-4xl font-extrabold tracking-tight text-primary md:text-6xl lg:text-7xl">
               Tide monitoring that stays clear, connected, and ready.
             </h1>
 
@@ -30,17 +30,17 @@ export default function LandingPage() {
               technical teams respond faster to changing coastal conditions.
             </p>
 
-            <div className="mt-10 flex flex-wrap gap-4">
+            <div className="mt-10 flex md:flex-wrap gap-4">
               <Link
                 to="/signup"
-                className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-7 py-4 text-base font-bold text-on-primary shadow-xl shadow-primary/10 transition-all hover:bg-primary-container active:scale-[0.98]"
+                className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-4 md:px-7 py-4 text-sm md:text-md font-bold text-on-primary shadow-xl shadow-primary/10 transition-all hover:bg-primary-container active:scale-[0.98]"
               >
                 Get Started
                 <LuArrowRight size={18} />
               </Link>
               <Link
                 to="/login"
-                className="inline-flex cursor-pointer items-center rounded-xl bg-secondary-container px-7 py-4 text-base font-bold text-primary transition-colors hover:bg-surface-container-highest"
+                className="inline-flex cursor-pointer items-center rounded-xl bg-secondary-container px-7 py-4 font-bold text-primary transition-colors hover:bg-surface-container-highest"
               >
                 Sign In
               </Link>
@@ -52,7 +52,7 @@ export default function LandingPage() {
                   key={item.label}
                   className="rounded-2xl border border-outline-variant/10 bg-surface-container-lowest p-4 shadow-sm"
                 >
-                  <p className="text-2xl font-black text-primary">
+                  <p className="text-lg md:text-2xl font-black text-primary">
                     {item.value}
                   </p>
                   <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.22em] text-on-surface-variant">
@@ -234,7 +234,7 @@ export default function LandingPage() {
               <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-on-primary/80">
                 Ready to deploy
               </p>
-              <h2 className="mx-auto mt-4 max-w-3xl text-3xl font-black leading-tight text-on-primary md:text-5xl">
+              <h2 className="mx-auto mt-4 max-w-3xl text-2xl font-black leading-tight text-on-primary md:text-5xl">
                 Bring TideWatch into your coastal monitoring workflow.
               </h2>
               <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-on-primary/80 md:text-base">
