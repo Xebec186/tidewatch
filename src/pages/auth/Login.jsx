@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { LuEye, LuEyeOff, LuMail, LuLock } from "react-icons/lu";
-import { FcGoogle } from "react-icons/fc";
 import { Link, useNavigate } from "react-router-dom";
 import BackgroundGlow from "../../components/BackgroundGlow";
 import BrandHeader from "../../components/BrandHeader";
@@ -80,12 +79,6 @@ export default function Login() {
                   >
                     Password
                   </label>
-                  <a
-                    href="#"
-                    className="text-xs font-bold text-primary hover:underline underline-offset-4 cursor-pointer"
-                  >
-                    Forgot Password?
-                  </a>
                 </div>
 
                 <div className="relative">
@@ -124,25 +117,6 @@ export default function Login() {
                 className="mt-2 w-full rounded-xl bg-primary py-4 font-bold text-on-primary shadow-lg shadow-primary/10 cursor-pointer transition-all hover:bg-primary/90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Signing In..." : "Sign In"}
-              </button>
-
-              <div className="relative py-4">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-outline-variant/20" />
-                </div>
-                <div className="relative flex justify-center">
-                  <span className="bg-white px-4 text-xs font-bold uppercase tracking-widest text-on-surface-variant">
-                    Or
-                  </span>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                className="flex w-full items-center justify-center gap-3 rounded-xl border border-outline-variant/10 bg-surface-container-low py-3.5 font-semibold text-on-surface transition-all hover:bg-surface-container-high cursor-pointer"
-              >
-                <FcGoogle size={25} />
-                Sign in with Google
               </button>
             </form>
 

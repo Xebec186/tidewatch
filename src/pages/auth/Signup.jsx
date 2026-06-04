@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { FcGoogle } from "react-icons/fc";
 import { LuEye, LuEyeOff, LuLock, LuMail, LuUser } from "react-icons/lu";
 import { Link, useNavigate } from "react-router-dom";
 import BackgroundGlow from "../../components/BackgroundGlow";
@@ -25,7 +24,7 @@ export default function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (form.password !== form.confirmPassword) {
       return setError("Passwords do not match");
     }
@@ -69,22 +68,6 @@ export default function Signup() {
               {error}
             </div>
           )}
-
-          <button
-            type="button"
-            className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-xl bg-surface-container py-3.5 px-4 text-sm font-semibold text-on-surface transition-all duration-200 hover:bg-surface-container-high active:scale-[0.98]"
-          >
-            <FcGoogle className="h-5 w-5" />
-            Sign up with Google
-          </button>
-
-          <div className="relative my-8 flex items-center">
-            <div className="grow border-t border-outline-variant/30" />
-            <span className="mx-4 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">
-              or use email
-            </span>
-            <div className="grow border-t border-outline-variant/30" />
-          </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
