@@ -1,3 +1,4 @@
+import { useTelemetry } from "../../context/ThingsBoardContext";
 import {
   LuArrowRight,
   LuBatteryCharging,
@@ -25,17 +26,20 @@ import {
   Legend,
 } from "recharts";
 
-const telemetryData = [
-  { time: "13:00", level: 2.18, distance: 169.2, battery: 3.89 },
-  { time: "13:30", level: 2.24, distance: 167.8, battery: 3.88 },
-  { time: "14:00", level: 2.31, distance: 165.5, battery: 3.87 },
-  { time: "14:30", level: 2.41, distance: 163.9, battery: 3.86 },
-  { time: "15:00", level: 2.53, distance: 161.4, battery: 3.85 },
-  { time: "15:30", level: 2.62, distance: 159.8, battery: 3.84 },
-  { time: "16:00", level: 2.71, distance: 158.1, battery: 3.83 },
-  { time: "16:30", level: 2.79, distance: 156.8, battery: 3.82 },
-  { time: "17:00", level: 2.86, distance: 155.9, battery: 3.81 },
-];
+// Utility to format ThingsBoard data for Recharts
+const formatTelemetry = (telemetry, key) => {
+  if (!telemetry[key]) return [];
+  return telemetry[key]
+    .map(([ts, val]) => ({
+      time: new Date(ts).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      value: parseFloat(val),
+      ts,
+    }))
+    .reverse(); // ThingsBoard sends newest first
+};
 
 const alertTrend = [
   { time: "Mon", warning: 1, danger: 0 },
@@ -61,51 +65,12 @@ const logs = [
   {
     timestamp: "2024-10-24 16:42:40",
     type: "Info",
-    message: "ESP8266 connection revalidated after brief reconnect.",
+    message: "ESP32 connection revalidated after brief reconnect.",
   },
   {
     timestamp: "2024-10-24 16:31:05",
     type: "Info",
     message: "GPS coordinates updated for Harbor Gate station.",
-  },
-];
-
-const historyRows = [
-  {
-    timestamp: "2024-10-24 17:02:15",
-    distance: 155.9,
-    level: 2.86,
-    battery: 3.81,
-    gps: "5.6037, -0.1870",
-    latency: "1.2s",
-    status: "OK",
-  },
-  {
-    timestamp: "2024-10-24 17:01:15",
-    distance: 156.3,
-    level: 2.84,
-    battery: 3.81,
-    gps: "5.6037, -0.1870",
-    latency: "1.1s",
-    status: "OK",
-  },
-  {
-    timestamp: "2024-10-24 17:00:15",
-    distance: 156.9,
-    level: 2.83,
-    battery: 3.82,
-    gps: "5.6037, -0.1870",
-    latency: "1.3s",
-    status: "OK",
-  },
-  {
-    timestamp: "2024-10-24 16:59:15",
-    distance: 157.4,
-    level: 2.82,
-    battery: 3.82,
-    gps: "5.6037, -0.1870",
-    latency: "1.4s",
-    status: "OK",
   },
 ];
 
@@ -163,6 +128,60 @@ function MetricCard({ label, value, helper, icon: Icon, tone = "default" }) {
 }
 
 export default function TechnicalDashboard() {
+  const { telemetry, isConnected, latestTs } = useTelemetry();
+
+  // Extract latest values
+  const getLatest = (key, fallback = "--") => {
+    if (telemetry[key] && telemetry[key].length > 0) {
+      return telemetry[key][0][1];
+    }
+    return fallback;
+  };
+
+  const level = getLatest("tide_m");
+  const distance = getLatest("distance_cm");
+  const battery = getLatest("battery");
+  const rssi = getLatest("rssi");
+  const lat = getLatest("latitude");
+  const lng = getLatest("longitude");
+
+  const formatVal = (val, decimals = 2) => {
+    const num = parseFloat(val);
+    return isNaN(num) ? val : num.toFixed(decimals);
+  };
+
+  const gpsCoords =
+    lat !== "--" && lng !== "--"
+      ? `${parseFloat(lat).toFixed(4)}, ${parseFloat(lng).toFixed(4)}`
+      : "5.6037, -0.1870"; // Fallback to Harbor Gate
+
+  const signalLabel =
+    rssi !== "--"
+      ? parseInt(rssi) > -60
+        ? "Strong"
+        : parseInt(rssi) > -80
+          ? "Good"
+          : "Weak"
+      : isConnected
+        ? "Strong"
+        : "Lost";
+
+  // Format data for chart
+  const chartData = formatTelemetry(telemetry, "tide_m").map((item) => {
+    const dVal = telemetry["distance_cm"]?.find((d) => d[0] === item.ts)?.[1];
+    const bVal = telemetry["battery"]?.find((b) => b[0] === item.ts)?.[1];
+    return {
+      ...item,
+      level: item.value,
+      distance: dVal ? parseFloat(dVal) : null,
+      battery: bVal ? parseFloat(bVal) : null,
+    };
+  });
+
+  const lastUpdated = latestTs
+    ? new Date(latestTs).toLocaleTimeString()
+    : "Never";
+
   return (
     <div className="min-h-screen bg-surface text-on-surface font-manrope selection:bg-primary-fixed selection:text-on-primary-fixed">
       <main className="mx-auto max-w-7xl px-6 py-8 md:py-10">
@@ -183,8 +202,7 @@ export default function TechnicalDashboard() {
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-on-surface-variant md:text-lg">
               This view is for operators and technicians. It exposes battery
               level, device health, timing, and historical telemetry for the
-              single TideWatch station powered by Arduino UNO, ultrasonic
-              sensing, GPS, and ESP8266.
+              single TideWatch station powered by ESP32.
             </p>
           </div>
 
@@ -196,7 +214,7 @@ export default function TechnicalDashboard() {
                     Node health
                   </p>
                   <h2 className="mt-3 text-3xl font-black tracking-tight">
-                    Stable
+                    {isConnected ? "Stable" : "Offline"}
                   </h2>
                 </div>
                 <div className="rounded-full bg-on-primary/10 p-3">
@@ -207,10 +225,10 @@ export default function TechnicalDashboard() {
               <div className="mt-6 space-y-3">
                 <div className="flex items-center justify-between rounded-2xl bg-on-primary/10 px-4 py-3">
                   <span className="text-sm font-semibold text-on-primary/80">
-                    Uptime
+                    Last Update
                   </span>
                   <span className="text-sm font-bold text-on-primary">
-                    142h 12m
+                    {lastUpdated}
                   </span>
                 </div>
                 <div className="flex items-center justify-between rounded-2xl bg-on-primary/10 px-4 py-3">
@@ -218,7 +236,7 @@ export default function TechnicalDashboard() {
                     Signal
                   </span>
                   <span className="text-sm font-bold text-on-primary">
-                    Strong
+                    {signalLabel}
                   </span>
                 </div>
               </div>
@@ -240,28 +258,28 @@ export default function TechnicalDashboard() {
         >
           <MetricCard
             label="Tide level"
-            value="2.84 m"
+            value={`${formatVal(level)} m`}
             helper="Current water level from the live sensor stream"
             icon={LuWaves}
           />
           <MetricCard
             label="Sensor distance"
-            value="156 cm"
+            value={`${formatVal(distance)} cm`}
             helper="Raw ultrasonic return used to compute tide height"
             icon={LuGauge}
           />
           <MetricCard
             label="Battery level"
-            value="82%"
+            value={`${formatVal(battery)} V`}
             helper="Visible to technical users and admins only"
             icon={LuBatteryCharging}
           />
           <MetricCard
             label="Device status"
-            value="Online"
-            helper="ESP8266 is actively pushing readings to Firebase"
+            value={isConnected ? "Online" : "Offline"}
+            helper="Real-time connection to ThingsBoard WebSocket"
             icon={LuSignal}
-            tone="primary"
+            tone={isConnected ? "primary" : "default"}
           />
         </section>
 
@@ -277,7 +295,9 @@ export default function TechnicalDashboard() {
                 </h2>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <StatusPill tone="warning">Live stream</StatusPill>
+                <StatusPill tone={isConnected ? "safe" : "danger"}>
+                  {isConnected ? "Live stream" : "Disconnected"}
+                </StatusPill>
                 <StatusPill>Real-time</StatusPill>
               </div>
             </div>
@@ -285,7 +305,7 @@ export default function TechnicalDashboard() {
             <div className="h-[340px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
-                  data={telemetryData}
+                  data={chartData}
                   margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
                 >
                   <CartesianGrid
@@ -359,10 +379,12 @@ export default function TechnicalDashboard() {
               <div className="mt-6 space-y-4">
                 <div className="flex items-center justify-between rounded-2xl bg-surface-container-low px-4 py-3">
                   <span className="text-sm font-semibold text-on-surface-variant">
-                    Wi-Fi module
+                    ThingsBoard WS
                   </span>
-                  <span className="text-sm font-bold text-primary">
-                    Connected
+                  <span
+                    className={`text-sm font-bold ${isConnected ? "text-primary" : "text-error"}`}
+                  >
+                    {isConnected ? "Connected" : "Disconnected"}
                   </span>
                 </div>
                 <div className="flex items-center justify-between rounded-2xl bg-surface-container-low px-4 py-3">
@@ -375,14 +397,16 @@ export default function TechnicalDashboard() {
                   <span className="text-sm font-semibold text-on-surface-variant">
                     Last sync
                   </span>
-                  <span className="text-sm font-bold text-primary">1.2s</span>
+                  <span className="text-sm font-bold text-primary">
+                    {isConnected ? "Active" : "---"}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between rounded-2xl bg-surface-container-low px-4 py-3">
                   <span className="text-sm font-semibold text-on-surface-variant">
                     Battery status
                   </span>
                   <span className="text-sm font-bold text-primary">
-                    Healthy
+                    {parseFloat(battery) > 3.5 ? "Healthy" : "Low"}
                   </span>
                 </div>
               </div>
@@ -398,7 +422,7 @@ export default function TechnicalDashboard() {
                     GPS coordinates
                   </span>
                   <span className="text-sm font-black text-primary">
-                    5.6037, -0.1870
+                    {gpsCoords}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
@@ -414,14 +438,14 @@ export default function TechnicalDashboard() {
                     Current update rate
                   </span>
                   <span className="text-sm font-black text-primary">
-                    Every 1 min
+                    Real-time
                   </span>
                 </div>
               </div>
               <div className="mt-6 flex items-center gap-3 rounded-2xl bg-surface-container-lowest/70 px-4 py-4">
                 <LuMapPin className="text-primary" size={18} />
                 <p className="text-sm text-on-surface-variant">
-                  Single-station deployment configured for the TideWatch MVP.
+                  Live data source: ThingsBoard Cloud IoT Platform.
                 </p>
               </div>
             </div>
@@ -571,7 +595,7 @@ export default function TechnicalDashboard() {
             <div className="flex items-center gap-2 rounded-xl bg-surface-container-low px-3 py-2 text-on-surface-variant">
               <LuClock3 size={16} />
               <span className="text-xs font-bold uppercase tracking-[0.22em]">
-                Real-time stream
+                {isConnected ? "Real-time stream" : "Offline"}
               </span>
             </div>
           </div>
@@ -596,40 +620,34 @@ export default function TechnicalDashboard() {
                     GPS
                   </th>
                   <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant text-center">
-                    Latency
-                  </th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant text-center">
                     Status
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/10">
-                {historyRows.map((row) => (
+                {chartData.slice(0, 10).map((row) => (
                   <tr
-                    key={row.timestamp}
+                    key={row.ts}
                     className="transition-colors hover:bg-surface-container-low/50"
                   >
                     <td className="px-6 py-4 text-xs font-mono font-medium text-on-surface">
-                      {row.timestamp}
+                      {new Date(row.ts).toLocaleString()}
                     </td>
                     <td className="px-6 py-4 text-xs font-bold text-primary">
-                      {row.distance.toFixed(1)}
+                      {row.distance?.toFixed(1) || "--"}
                     </td>
                     <td className="px-6 py-4 text-xs font-bold text-primary">
-                      {row.level.toFixed(2)}
+                      {row.level?.toFixed(2) || "--"}
                     </td>
                     <td className="px-6 py-4 text-xs font-bold text-primary">
-                      {row.battery.toFixed(2)}
+                      {row.battery?.toFixed(2) || "--"}
                     </td>
                     <td className="px-6 py-4 text-xs font-medium text-on-surface-variant">
-                      {row.gps}
-                    </td>
-                    <td className="px-6 py-4 text-center text-xs font-bold text-on-surface-variant">
-                      {row.latency}
+                      {gpsCoords}
                     </td>
                     <td className="px-6 py-4 text-center">
                       <span className="rounded-full bg-tertiary-container/20 px-2 py-0.5 text-[9px] font-black uppercase text-tertiary">
-                        {row.status}
+                        OK
                       </span>
                     </td>
                   </tr>

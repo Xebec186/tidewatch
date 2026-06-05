@@ -1,3 +1,4 @@
+import { useTelemetry } from "../../context/ThingsBoardContext";
 import {
   LuArrowRight,
   LuBellRing,
@@ -21,15 +22,17 @@ import {
 import StatusPill from "../../components/StatusPill";
 import MetricCard from "../../components/MetricCard";
 
-const tideData = [
-  { time: "06:00", tide: 1.9 },
-  { time: "08:00", tide: 2.1 },
-  { time: "10:00", tide: 2.4 },
-  { time: "12:00", tide: 2.8 },
-  { time: "14:00", tide: 2.7 },
-  { time: "16:00", tide: 2.9 },
-  { time: "18:00", tide: 3.1 },
-];
+// Utility to format ThingsBoard data for Recharts
+const formatTelemetry = (telemetry, key) => {
+  if (!telemetry[key]) return [];
+  return telemetry[key]
+    .map(([ts, val]) => ({
+      time: new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      tide: parseFloat(val),
+      ts
+    }))
+    .reverse();
+};
 
 const alertData = [
   { time: "07:10", value: 1 },
@@ -60,34 +63,54 @@ const recentAlerts = [
   },
 ];
 
-const statCards = [
-  {
-    label: "Current tide level",
-    value: "2.84 m",
-    helper: "Measured from the ultrasonic sensor",
-    icon: LuWaves,
-  },
-  {
-    label: "System status",
-    value: "Safe",
-    helper: "Below the warning threshold",
-    icon: LuShieldCheck,
-  },
-  {
-    label: "Last updated",
-    value: "2 mins ago",
-    helper: "Fresh reading received from device",
-    icon: LuClock3,
-  },
-  {
-    label: "Device connection",
-    value: "Online",
-    helper: "ESP8266 data stream active",
-    icon: LuSignal,
-  },
-];
-
 export default function RegularDashboard() {
+  const { telemetry, isConnected, latestTs } = useTelemetry();
+
+  const getLatest = (key, fallback = "--") => {
+    if (telemetry[key] && telemetry[key].length > 0) {
+      return telemetry[key][0][1];
+    }
+    return fallback;
+  };
+
+  const currentTideRaw = getLatest("tide_m");
+  const currentTide = !isNaN(parseFloat(currentTideRaw)) 
+    ? parseFloat(currentTideRaw).toFixed(2) 
+    : currentTideRaw;
+  
+  const chartData = formatTelemetry(telemetry, "tide_m");
+
+  const lastUpdated = latestTs 
+    ? new Date(latestTs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+    : "---";
+
+  const statCards = [
+    {
+      label: "Current tide level",
+      value: `${currentTide} m`,
+      helper: "Measured from the ultrasonic sensor",
+      icon: LuWaves,
+    },
+    {
+      label: "System status",
+      value: isConnected ? "Safe" : "Offline",
+      helper: "Below the warning threshold",
+      icon: LuShieldCheck,
+    },
+    {
+      label: "Last updated",
+      value: lastUpdated,
+      helper: "Fresh reading received from device",
+      icon: LuClock3,
+    },
+    {
+      label: "Device connection",
+      value: isConnected ? "Online" : "Offline",
+      helper: "ThingsBoard data stream status",
+      icon: LuSignal,
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-surface text-on-surface font-manrope selection:bg-primary-container selection:text-on-primary-container">
       <main className="mx-auto max-w-7xl px-6 py-8 md:py-10">
@@ -95,11 +118,11 @@ export default function RegularDashboard() {
           <div className="lg:col-span-8">
             <div className="mb-4 flex items-center gap-3">
               <span className="relative flex h-3 w-3">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex h-3 w-3 rounded-full bg-emerald-500" />
+                <span className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 ${isConnected ? "bg-emerald-400" : "bg-red-400"}`} />
+                <span className={`relative inline-flex h-3 w-3 rounded-full ${isConnected ? "bg-emerald-500" : "bg-red-500"}`} />
               </span>
               <span className="text-xs font-bold uppercase tracking-[0.2em] text-on-surface-variant">
-                Live system monitoring
+                {isConnected ? "Live system monitoring" : "System Offline"}
               </span>
             </div>
 
@@ -107,9 +130,8 @@ export default function RegularDashboard() {
               Coastal Station 01
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-on-surface-variant md:text-lg">
-              TideWatch is tracking tide activity in real time and helping users
-              stay informed with a clear view of the current water level,
-              operational status, and recent alerts.
+              TideWatch is tracking tide activity in real time via ThingsBoard and helping users
+              stay informed with a clear view of the current water level and system status.
             </p>
           </div>
 
@@ -121,9 +143,9 @@ export default function RegularDashboard() {
                     Current status
                   </p>
                   <div className="mt-3 flex flex-col items-start md:items-center md:flex-row gap-3">
-                    <StatusPill label="Safe" />
+                    <StatusPill label={isConnected ? "Safe" : "Offline"} />
                     <span className="text-xs font-semibold text-on-surface-variant">
-                      Updated 2 mins ago
+                      Updated {lastUpdated}
                     </span>
                   </div>
                 </div>
@@ -165,15 +187,15 @@ export default function RegularDashboard() {
                 </h2>
               </div>
               <div className="flex items-center gap-2">
-                <StatusPill label="24h view" />
-                <StatusPill label="Live data" tone="warning" />
+                <StatusPill label="Real-time" />
+                <StatusPill label="Live data" tone={isConnected ? "safe" : "danger"} />
               </div>
             </div>
 
             <div className="h-80 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
-                  data={tideData}
+                  data={chartData}
                   margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
                 >
                   <CartesianGrid
@@ -191,7 +213,6 @@ export default function RegularDashboard() {
                     tickLine={false}
                     axisLine={false}
                     tick={{ fill: "#3f484b", fontSize: 12 }}
-                    domain={[1.5, 3.5]}
                   />
                   <Tooltip
                     contentStyle={{
@@ -228,7 +249,7 @@ export default function RegularDashboard() {
                     Latest advisory
                   </p>
                   <h2 className="mt-3 text-2xl font-black tracking-tight">
-                    Monitoring remains safe.
+                    {isConnected ? "Monitoring remains safe." : "System Disconnected."}
                   </h2>
                 </div>
                 <div className="rounded-full bg-on-primary/10 p-3">
@@ -237,9 +258,9 @@ export default function RegularDashboard() {
               </div>
 
               <p className="mt-4 text-sm leading-relaxed text-on-primary/80">
-                Tide levels are rising, but the current reading is still within
-                the safe operating range. Keep watching the trend as the evening
-                tide approaches.
+                {isConnected 
+                  ? "Tide levels are being tracked live. The current reading is within the safe operating range."
+                  : "We've lost connection to the station. Please check device power and network connectivity."}
               </p>
 
               <button
@@ -260,14 +281,16 @@ export default function RegularDashboard() {
                   <span className="text-sm font-semibold text-on-surface-variant">
                     Status
                   </span>
-                  <span className="text-sm font-bold text-primary">Online</span>
+                  <span className={`text-sm font-bold ${isConnected ? "text-primary" : "text-error"}`}>
+                    {isConnected ? "Online" : "Offline"}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between rounded-2xl bg-surface-container-low px-4 py-3">
                   <span className="text-sm font-semibold text-on-surface-variant">
                     Last ping
                   </span>
                   <span className="text-sm font-bold text-primary">
-                    2 mins ago
+                    {lastUpdated}
                   </span>
                 </div>
                 <div className="flex items-center justify-between rounded-2xl bg-surface-container-low px-4 py-3 gap-20">
@@ -275,7 +298,7 @@ export default function RegularDashboard() {
                     Source
                   </span>
                   <span className="text-sm font-bold text-primary">
-                    Arduino UNO + ESP8266
+                    ThingsBoard Cloud
                   </span>
                 </div>
               </div>

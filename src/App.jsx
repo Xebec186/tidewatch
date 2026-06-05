@@ -6,6 +6,7 @@ import DashboardLayout from "./layouts/DashboardLayout";
 import SimpleLayout from "./layouts/SimpleLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
+import { ThingsBoardProvider } from "./context/ThingsBoardContext";
 import "./App.css";
 
 // Lazy load page components
@@ -22,39 +23,41 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Suspense
-          fallback={
-            <div className="flex h-screen w-full items-center justify-center bg-surface">
-              <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-            </div>
-          }
-        >
-          <Routes>
-            <Route element={<AuthLayout />}>
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-            </Route>
-
-            <Route element={<MainLayout />}>
-              <Route path="/" element={<LandingPage />} />
-            </Route>
-
-            <Route element={<SimpleLayout />}>
-              <Route path="/privacy" element={<PrivacyPolicy />} />
-              <Route path="/terms" element={<TermsOfService />} />
-              <Route path="/support" element={<ContactSupport />} />
-            </Route>
-
-            <Route element={<ProtectedRoute />}>
-              <Route element={<DashboardLayout />}>
-                <Route path="/dashboard" element={<DashboardRouter />} />
-                <Route path="/profile" element={<ProfilePage />} />
+        <ThingsBoardProvider>
+          <Suspense
+            fallback={
+              <div className="flex h-screen w-full items-center justify-center bg-surface">
+                <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+              </div>
+            }
+          >
+            <Routes>
+              <Route element={<AuthLayout />}>
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
               </Route>
-            </Route>
 
-            <Route path="*" element={<h1>404 Not Found</h1>} />
-          </Routes>
-        </Suspense>
+              <Route element={<MainLayout />}>
+                <Route path="/" element={<LandingPage />} />
+              </Route>
+
+              <Route element={<SimpleLayout />}>
+                <Route path="/privacy" element={<PrivacyPolicy />} />
+                <Route path="/terms" element={<TermsOfService />} />
+                <Route path="/support" element={<ContactSupport />} />
+              </Route>
+
+              <Route element={<ProtectedRoute />}>
+                <Route element={<DashboardLayout />}>
+                  <Route path="/dashboard" element={<DashboardRouter />} />
+                  <Route path="/profile" element={<ProfilePage />} />
+                </Route>
+              </Route>
+
+              <Route path="*" element={<h1>404 Not Found</h1>} />
+            </Routes>
+          </Suspense>
+        </ThingsBoardProvider>
       </AuthProvider>
     </BrowserRouter>
   );

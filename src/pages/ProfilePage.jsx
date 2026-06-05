@@ -1,16 +1,9 @@
 import { useAuth } from "../context/AuthContext";
 import {
   LuBellRing,
-  LuChevronRight,
   LuClock3,
-  LuCopy,
-  LuEye,
   LuGlobe,
-  LuLock,
-  LuShieldCheck,
   LuCircleUser,
-  LuBatteryCharging,
-  LuHistory,
   LuKeyRound,
   LuPencil,
 } from "react-icons/lu";

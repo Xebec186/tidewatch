@@ -1,11 +1,23 @@
 import { Link } from "react-router-dom";
 import { LuArrowRight, LuBellRing, LuBadgeInfo } from "react-icons/lu";
-import { SiArduino } from "react-icons/si";
+import { MdOutlineSensors } from "react-icons/md";
 import { features } from "../data/features";
 import { stats } from "../data/stats";
 import { audience } from "../data/audience";
+import { useTelemetry } from "../context/ThingsBoardContext";
 
 export default function LandingPage() {
+  const { telemetry, isConnected } = useTelemetry();
+
+  const getLatest = (key, fallback = "--") => {
+    if (telemetry[key] && telemetry[key].length > 0) {
+      return telemetry[key][0][1];
+    }
+    return fallback;
+  };
+
+  const currentTide = getLatest("level");
+
   return (
     <div className="min-h-screen bg-surface text-on-surface font-manrope selection:bg-primary-container selection:text-on-primary-container">
       <main className="relative overflow-hidden">
@@ -15,9 +27,13 @@ export default function LandingPage() {
 
         <section className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-14 px-6 pb-24 pt-10 lg:grid-cols-12">
           <div className="lg:col-span-7">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-secondary-container px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-on-secondary-fixed-variant">
-              <span className="h-2 w-2 rounded-full bg-primary" />
-              System status: active
+            <div
+              className={`mb-6 inline-flex items-center gap-2 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] ${isConnected ? "bg-secondary-container text-on-secondary-fixed-variant" : "bg-error-container text-on-error-container"}`}
+            >
+              <span
+                className={`h-2 w-2 rounded-full ${isConnected ? "bg-primary animate-pulse" : "bg-error"}`}
+              />
+              System status: {isConnected ? "active" : "offline"}
             </div>
 
             <h1 className="max-w-3xl text-4xl font-extrabold tracking-tight text-primary md:text-6xl lg:text-7xl">
@@ -73,21 +89,23 @@ export default function LandingPage() {
                     </p>
                     <div className="mt-2 flex items-end gap-2">
                       <span className="text-5xl font-black tracking-tight text-primary">
-                        2.84
+                        {currentTide}
                       </span>
                       <span className="pb-1 text-xl font-bold text-on-surface-variant">
                         m
                       </span>
                     </div>
                   </div>
-                  <div className="rounded-full bg-tertiary-container px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-on-tertiary-container">
-                    Rising
+                  <div
+                    className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] ${isConnected ? "bg-tertiary-container text-on-tertiary-container" : "bg-error-container text-on-error-container"}`}
+                  >
+                    {isConnected ? "Live" : "Offline"}
                   </div>
                 </div>
 
                 <div className="relative h-28 overflow-hidden rounded-2xl bg-surface-container-low">
                   <svg
-                    className="absolute inset-0 h-full w-full"
+                    className={`absolute inset-0 h-full w-full ${isConnected ? "animate-pulse" : ""}`}
                     viewBox="0 0 400 100"
                     preserveAspectRatio="none"
                     aria-hidden="true"
@@ -128,15 +146,23 @@ export default function LandingPage() {
                 <p className="text-xs font-bold uppercase tracking-[0.22em] text-on-surface-variant">
                   Alert state
                 </p>
-                <p className="mt-2 text-2xl font-black text-primary">Stable</p>
+                <p
+                  className={`mt-2 text-2xl font-black ${isConnected ? "text-primary" : "text-on-surface-variant"}`}
+                >
+                  {isConnected ? "Stable" : "---"}
+                </p>
               </div>
 
               <div className="rounded-2xl border border-outline-variant/10 bg-surface-container-lowest p-6 shadow-sm">
-                <SiArduino className="mb-4 text-primary" size={22} />
+                <MdOutlineSensors className="mb-4 text-primary" size={22} />
                 <p className="text-xs font-bold uppercase tracking-[0.22em] text-on-surface-variant">
                   Device mode
                 </p>
-                <p className="mt-2 text-2xl font-black text-primary">Online</p>
+                <p
+                  className={`mt-2 text-2xl font-black ${isConnected ? "text-primary" : "text-error"}`}
+                >
+                  {isConnected ? "Online" : "Offline"}
+                </p>
               </div>
             </div>
           </div>
