@@ -345,7 +345,7 @@ export default function RegularDashboard() {
               <LuGauge className="text-primary" size={22} />
             </div>
 
-            <div className="h-[220px] w-full">
+            <div className="h-55 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={alertData}>
                   <defs>

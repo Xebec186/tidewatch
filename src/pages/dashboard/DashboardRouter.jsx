@@ -1,20 +1,38 @@
+import { lazy, Suspense } from "react";
 import { useAuth } from "../../context/AuthContext";
 
-import RegularDashboard from "./RegularDashboard";
-import TechnicalDashboard from "./TechnicalDashboard";
-import AdminDashboard from "./AdminDashboard";
+const RegularDashboard = lazy(() => import("./RegularDashboard"));
+const TechnicalDashboard = lazy(() => import("./TechnicalDashboard"));
+const AdminDashboard = lazy(() => import("./AdminDashboard"));
 
 export default function DashboardRouter() {
   const { user } = useAuth();
 
+  let DashboardComponent;
+
   switch (user.role) {
     case "technical":
-      return <TechnicalDashboard />;
+      DashboardComponent = <TechnicalDashboard />;
+      break;
 
     case "admin":
-      return <AdminDashboard />;
+      DashboardComponent = <AdminDashboard />;
+      break;
 
     default:
-      return <RegularDashboard />;
+      DashboardComponent = <RegularDashboard />;
+      break;
   }
+
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-64 w-full items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+        </div>
+      }
+    >
+      {DashboardComponent}
+    </Suspense>
+  );
 }
