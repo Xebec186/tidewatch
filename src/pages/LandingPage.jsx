@@ -25,7 +25,7 @@ export default function LandingPage() {
         <div className="pointer-events-none absolute -top-24 -right-24 h-96 w-96 rounded-full bg-primary/5 blur-3xl" />
         <div className="pointer-events-none absolute top-1/2 -left-48 h-96 w-96 rounded-full bg-tertiary/5 blur-3xl" />
 
-        <section className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-14 px-6 pb-24 pt-10 lg:grid-cols-12">
+        <section className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-14 px-6 pb-24 pt-8 lg:grid-cols-12">
           <div className="lg:col-span-7">
             <div
               className={`mb-6 inline-flex items-center gap-2 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] ${isConnected ? "bg-secondary-container text-on-secondary-fixed-variant" : "bg-error-container text-on-error-container"}`}
@@ -168,7 +168,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="features" className="bg-surface-container-low py-12">
+        <section id="features" className="bg-surface-container-low py-25">
           <div className="mx-auto max-w-7xl px-6">
             <div className="mb-16 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
               <div className="max-w-3xl">
@@ -253,10 +253,10 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="cta" className="px-6 pb-32 pt-6">
-          <div className="relative mx-auto max-w-5xl overflow-hidden rounded-4xl bg-primary">
+        <section id="cta" className="px-1 md:px-6 pb-42 pt-25">
+          <div className="relative mx-auto max-w-full sm:max-w-5xl overflow-hidden rounded-4xl bg-primary">
             <div className="absolute inset-0 bg-linear-to-br from-primary via-primary to-tertiary opacity-95" />
-            <div className="relative z-10 px-8 py-16 text-center md:px-16 md:py-24">
+            <div className="relative z-10 px-5 py-8 text-center md:px-16 md:py-24">
               <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-on-primary/80">
                 Ready to deploy
               </p>
