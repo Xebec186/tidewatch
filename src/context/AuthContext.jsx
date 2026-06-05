@@ -3,9 +3,14 @@ import {
   onAuthStateChanged, 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
-  signOut 
+  signOut,
+  updateProfile,
+  updatePassword,
+  deleteUser,
+  reauthenticateWithCredential,
+  EmailAuthProvider
 } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
 
 const AuthContext = createContext();
@@ -26,7 +31,6 @@ export function AuthProvider({ children }) {
               uid: firebaseUser.uid,
               email: firebaseUser.email,
               displayName: userData.fullName || firebaseUser.displayName || "User",
-              role: userData.role || "regular",
               ...userData
             });
           } else {
@@ -35,7 +39,6 @@ export function AuthProvider({ children }) {
               uid: firebaseUser.uid,
               email: firebaseUser.email,
               displayName: firebaseUser.displayName || "User",
-              role: "regular",
             });
           }
         } catch (error) {
@@ -44,7 +47,6 @@ export function AuthProvider({ children }) {
             uid: firebaseUser.uid,
             email: firebaseUser.email,
             displayName: firebaseUser.displayName || "User",
-            role: "regular",
           });
         }
       } else {
@@ -69,6 +71,7 @@ export function AuthProvider({ children }) {
       email,
       uid: firebaseUser.uid,
       createdAt: new Date().toISOString(),
+      alertsEnabled: false, // Default alerts to off as requested
       ...additionalData
     });
 
@@ -79,13 +82,64 @@ export function AuthProvider({ children }) {
     return signOut(auth);
   };
 
+  const updateUserProfile = async (data) => {
+    if (!auth.currentUser) return;
+
+    // Update Firebase Auth Display Name
+    if (data.fullName) {
+      await updateProfile(auth.currentUser, {
+        displayName: data.fullName
+      });
+    }
+
+    // Update Firestore Doc
+    const userDocRef = doc(db, "users", auth.currentUser.uid);
+    await setDoc(userDocRef, {
+      ...data,
+      updatedAt: new Date().toISOString()
+    }, { merge: true });
+
+    // Refresh local state
+    setUser(prev => ({ ...prev, ...data, displayName: data.fullName || prev.displayName }));
+  };
+
+  const updateUserPassword = async (oldPassword, newPassword) => {
+    if (!auth.currentUser) return;
+
+    // 1. Re-authenticate first (Required by Firebase for sensitive actions)
+    const credential = EmailAuthProvider.credential(auth.currentUser.email, oldPassword);
+    await reauthenticateWithCredential(auth.currentUser, credential);
+    
+    // 2. Update password
+    await updatePassword(auth.currentUser, newPassword);
+  };
+
+  const deleteUserAccount = async (password) => {
+    if (!auth.currentUser) return;
+    const uid = auth.currentUser.uid;
+
+    // 1. Re-authenticate first
+    const credential = EmailAuthProvider.credential(auth.currentUser.email, password);
+    await reauthenticateWithCredential(auth.currentUser, credential);
+
+    // 2. Delete Firestore data
+    await deleteDoc(doc(db, "users", uid));
+
+    // 3. Delete Auth account
+    await deleteUser(auth.currentUser);
+  };
+
   const value = {
     user,
-    login,
     signup,
+    login,
     logout,
-    loading
+    updateUserProfile,
+    updateUserPassword,
+    deleteUserAccount,
+    loading,
   };
+
 
   return (
     <AuthContext.Provider value={value}>

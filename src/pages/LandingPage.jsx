@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { LuArrowRight, LuBellRing, LuBadgeInfo } from "react-icons/lu";
+import { LuArrowRight, LuWaves, LuBadgeInfo } from "react-icons/lu";
 import { MdOutlineSensors } from "react-icons/md";
 import { features } from "../data/features";
 import { stats } from "../data/stats";
@@ -16,8 +16,10 @@ export default function LandingPage() {
     return fallback;
   };
 
-  const currentTide = getLatest("level");
-
+  const currentTideRaw = getLatest("tide_m");
+  const currentTide = currentTideRaw !== "--" && !isNaN(parseFloat(currentTideRaw)) 
+    ? parseFloat(currentTideRaw).toFixed(2) 
+    : "--";
   return (
     <div className="min-h-screen bg-surface text-on-surface font-manrope selection:bg-primary-container selection:text-on-primary-container">
       <main className="relative overflow-hidden">
@@ -42,8 +44,8 @@ export default function LandingPage() {
 
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-on-surface-variant md:text-xl">
               TideWatch is a low-cost tide gauge system built to measure water
-              levels, support alert delivery, and help communities, schools, and
-              technical teams respond faster to changing coastal conditions.
+              levels and help coastal teams respond faster to changing
+              conditions using real-time ultrasonic sensing.
             </p>
 
             <div className="mt-10 flex md:flex-wrap gap-4">
@@ -99,7 +101,7 @@ export default function LandingPage() {
                   <div
                     className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] ${isConnected ? "bg-tertiary-container text-on-tertiary-container" : "bg-error-container text-on-error-container"}`}
                   >
-                    {isConnected ? "Live" : "Offline"}
+                    {isConnected ? "Live Stream" : "Station Offline"}
                   </div>
                 </div>
 
@@ -142,14 +144,14 @@ export default function LandingPage() {
               </div>
 
               <div className="rounded-2xl border border-outline-variant/10 bg-surface-container-lowest p-6 shadow-sm">
-                <LuBellRing className="mb-4 text-primary" size={22} />
+                <LuWaves className="mb-4 text-primary" size={22} />
                 <p className="text-xs font-bold uppercase tracking-[0.22em] text-on-surface-variant">
-                  Alert state
+                  Monitoring
                 </p>
                 <p
                   className={`mt-2 text-2xl font-black ${isConnected ? "text-primary" : "text-on-surface-variant"}`}
                 >
-                  {isConnected ? "Stable" : "---"}
+                  {isConnected ? "Active" : "---"}
                 </p>
               </div>
 
@@ -220,15 +222,15 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start">
             <div className="lg:col-span-5">
               <p className="text-sm font-bold uppercase tracking-[0.24em] text-on-surface-variant">
-                User roles
+                Experience
               </p>
               <h2 className="mt-3 text-4xl font-extrabold tracking-tight text-primary">
-                Two user types, one system.
+                A unified view for everyone.
               </h2>
               <p className="mt-5 max-w-xl text-on-surface-variant">
-                This keeps the interface simple for people who just need tide
-                updates, while still giving administrators the tools to manage
-                the device and its alert logic.
+                Whether you are a coastal resident checking the daily tide or a
+                technician monitoring sensor performance, TideWatch provides all
+                the critical data in one powerful, real-time dashboard.
               </p>
             </div>
 
@@ -265,7 +267,7 @@ export default function LandingPage() {
               </h2>
               <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-on-primary/80 md:text-base">
                 Start with the public landing page, then move into the secure
-                login and signup flow for regular and technical users.
+                login and signup flow.
               </p>
               <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
                 <Link

@@ -13,7 +13,7 @@ import "./App.css";
 const Login = lazy(() => import("./pages/auth/Login"));
 const Signup = lazy(() => import("./pages/auth/Signup"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
-const DashboardRouter = lazy(() => import("./pages/dashboard/DashboardRouter"));
+const MainDashboard = lazy(() => import("./pages/dashboard/MainDashboard"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
@@ -32,26 +32,30 @@ function App() {
             }
           >
             <Routes>
+              {/* Public Routes with Main Navbar */}
+              <Route element={<MainLayout />}>
+                <Route path="/" element={<LandingPage />} />
+              </Route>
+
+              {/* Auth Routes */}
               <Route element={<AuthLayout />}>
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
               </Route>
 
-              <Route element={<MainLayout />}>
-                <Route path="/" element={<LandingPage />} />
+              {/* Dashboard Route with Sidebar/Dashboard Navbar */}
+              <Route element={<ProtectedRoute />}>
+                <Route element={<DashboardLayout />}>
+                  <Route path="/dashboard" element={<MainDashboard />} />
+                </Route>
               </Route>
 
+              {/* Simple Routes (Privacy, Terms, Support, Profile) */}
               <Route element={<SimpleLayout />}>
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/terms" element={<TermsOfService />} />
                 <Route path="/support" element={<ContactSupport />} />
-              </Route>
-
-              <Route element={<ProtectedRoute />}>
-                <Route element={<DashboardLayout />}>
-                  <Route path="/dashboard" element={<DashboardRouter />} />
-                  <Route path="/profile" element={<ProfilePage />} />
-                </Route>
+                <Route path="/profile" element={<ProfilePage />} />
               </Route>
 
               <Route path="*" element={<h1>404 Not Found</h1>} />

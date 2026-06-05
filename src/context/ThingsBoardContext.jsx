@@ -89,40 +89,59 @@ export function ThingsBoardProvider({ children }) {
   }, [subscribeToDevice]);
 
   // 3. Declare login third
-  const login = useCallback(
-    async (username, password) => {
-      try {
-        const response = await fetch(`${TB_REST_URL}/auth/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, password }),
-        });
+  const login = useCallback(async (username, password) => {
+    console.log("TB: Attempting login to", TB_REST_URL, "with user:", username);
+    try {
+      const response = await fetch(`${TB_REST_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
 
-        if (!response.ok) throw new Error("ThingsBoard login failed");
-
-        const data = await response.json();
-        token.current = data.token;
-        connectWebSocket();
-      } catch (err) {
-        setError(err.message);
-        console.error("TB Login Error:", err);
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error("TB: Login failed status:", response.status, "Body:", errorData);
+        throw new Error(`ThingsBoard login failed: ${response.status}`);
       }
-    },
-    [connectWebSocket],
-  );
+
+      const data = await response.json();
+      console.log("TB: Login successful, token received");
+      token.current = data.token;
+      connectWebSocket();
+    } catch (err) {
+      setError(err.message);
+      console.error("TB: Connection process failed:", err);
+    }
+  }, [connectWebSocket]);
 
   // Auto-login on mount (enables public telemetry on landing page)
   useEffect(() => {
-    const user = import.meta.env.VITE_THINGSBOARD_USERNAME;
-    const pass = import.meta.env.VITE_THINGSBOARD_PASSWORD;
+    const tbUser = import.meta.env.VITE_THINGSBOARD_USERNAME;
+    const tbPass = import.meta.env.VITE_THINGSBOARD_PASSWORD;
+    const tbHost = import.meta.env.VITE_THINGSBOARD_HOST || "thingsboard.cloud";
+    const tbDeviceId = import.meta.env.VITE_THINGSBOARD_DEVICE_ID;
 
-    if (user && pass && !token.current) {
-      login(user, pass);
+    console.log("TB Context: Initializing...");
+    console.log("TB Context: Env Check:", { 
+      hasUser: !!tbUser, 
+      hasPass: !!tbPass, 
+      host: tbHost,
+      hasDeviceId: !!tbDeviceId 
+    });
+    
+    if (tbUser && tbPass && !token.current) {
+      login(tbUser, tbPass);
+    } else {
+      if (!tbUser || !tbPass) {
+        console.warn("TB Context: Missing credentials in .env file. Connection skipped.");
+      }
     }
 
     return () => {
-      // Cleanup on unmount
-      if (ws.current) ws.current.close();
+      if (ws.current) {
+        console.log("TB Context: Closing WebSocket on unmount");
+        ws.current.close();
+      }
     };
   }, [login]);
 

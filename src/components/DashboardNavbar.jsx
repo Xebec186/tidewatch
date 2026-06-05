@@ -10,7 +10,7 @@ import {
 } from "react-icons/lu";
 import { useAuth } from "../context/AuthContext";
 
-export default function TechnicalDashboardNavbar({ onNotificationToggle }) {
+export default function DashboardNavbar({ onNotificationToggle }) {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -28,14 +28,33 @@ export default function TechnicalDashboardNavbar({ onNotificationToggle }) {
 
   const handleNotifClick = (e) => {
     e.preventDefault();
-    console.log("Technical notification button clicked");
+    console.log("Notification button clicked");
     if (onNotificationToggle) onNotificationToggle();
+    setIsMenuOpen(false);
+  };
+
+  const scrollToSection = (id) => {
+    if (window.location.pathname !== "/dashboard") {
+      navigate(`/dashboard#${id}`);
+      return;
+    }
+    const element = document.getElementById(id);
+    if (element) {
+      const offset = 80; // Offset for sticky header
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth"
+      });
+    }
     setIsMenuOpen(false);
   };
 
   return (
     <header
-      className={`sticky top-0 z-50 border-b border-outline-variant/20 transition-colors duration-300 ${
+      className={`sticky top-0 z-40 border-b border-outline-variant/20 transition-colors duration-300 ${
         isMenuOpen ? "bg-surface" : "bg-surface/85 backdrop-blur-md"
       }`}
     >
@@ -49,30 +68,30 @@ export default function TechnicalDashboardNavbar({ onNotificationToggle }) {
               TideWatch
             </p>
             <p className="text-[10px] uppercase tracking-[0.22em] text-on-surface-variant">
-              Technical View
+              Live Monitor
             </p>
           </div>
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
-          <a
-            href="/dashboard#analytics"
-            className="text-sm font-medium text-primary"
+          <button
+            onClick={() => scrollToSection("overview")}
+            className="cursor-pointer text-sm font-medium text-primary hover:opacity-80"
           >
-            Analytics
-          </a>
-          <a
-            href="/dashboard#logs"
-            className="text-sm font-medium text-on-surface-variant transition-colors hover:text-primary"
+            Overview
+          </button>
+          <button
+            onClick={() => scrollToSection("charts")}
+            className="cursor-pointer text-sm font-medium text-on-surface-variant transition-colors hover:text-primary"
           >
-            Logs
-          </a>
-          <a
-            href="/dashboard#history"
-            className="text-sm font-medium text-on-surface-variant transition-colors hover:text-primary"
+            Charts
+          </button>
+          <button
+            onClick={() => scrollToSection("logs")}
+            className="cursor-pointer text-sm font-medium text-on-surface-variant transition-colors hover:text-primary"
           >
-            History
-          </a>
+            Activity
+          </button>
         </nav>
 
         <div className="flex items-center gap-3">
@@ -125,27 +144,24 @@ export default function TechnicalDashboardNavbar({ onNotificationToggle }) {
       >
         <div className="flex flex-col gap-4 p-6">
           <nav className="flex flex-col gap-4">
-            <a
-              href="/dashboard#analytics"
-              onClick={() => setIsMenuOpen(false)}
-              className="text-base font-semibold text-primary transition-colors"
+            <button
+              onClick={() => scrollToSection("overview")}
+              className="text-left text-base font-semibold text-primary transition-colors"
             >
-              Analytics
-            </a>
-            <a
-              href="/dashboard#logs"
-              onClick={() => setIsMenuOpen(false)}
-              className="text-base font-semibold text-on-surface-variant transition-colors hover:text-primary"
+              Overview
+            </button>
+            <button
+              onClick={() => scrollToSection("charts")}
+              className="text-left text-base font-semibold text-on-surface-variant transition-colors hover:text-primary"
             >
-              System Logs
-            </a>
-            <a
-              href="/dashboard#history"
-              onClick={() => setIsMenuOpen(false)}
-              className="text-base font-semibold text-on-surface-variant transition-colors hover:text-primary"
+              Charts
+            </button>
+            <button
+              onClick={() => scrollToSection("logs")}
+              className="text-left text-base font-semibold text-on-surface-variant transition-colors hover:text-primary"
             >
-              History
-            </a>
+              Activity
+            </button>
           </nav>
 
           <hr className="border-outline-variant/20" />
@@ -164,7 +180,7 @@ export default function TechnicalDashboardNavbar({ onNotificationToggle }) {
               className="flex items-center gap-3 rounded-xl border border-outline-variant/30 p-3 text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-primary"
             >
               <LuCircleUser size={18} />
-              <span className="text-sm font-semibold">Technical Profile</span>
+              <span className="text-sm font-semibold">My Profile</span>
             </Link>
             <button
               onClick={handleLogout}

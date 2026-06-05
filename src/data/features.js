@@ -1,4 +1,4 @@
-import { LuBellRing, LuShieldCheck, LuWifi, LuGauge } from "react-icons/lu";
+import { LuBellRing, LuShieldCheck, LuWifi } from "react-icons/lu";
 import { FiBarChart } from "react-icons/fi";
 import { MdOutlineSensors } from "react-icons/md";
 
@@ -28,15 +28,9 @@ export const features = [
       "The proposal supports Wi-Fi and alert delivery so data can reach the right people quickly.",
   },
   {
-    icon: LuGauge,
-    title: "Threshold control",
-    description:
-      "Technical users can manage alert limits, device settings, and operational checks from the system.",
-  },
-  {
     icon: MdOutlineSensors,
-    title: "Sensor-driven",
+    title: "Ultrasonic Precision",
     description:
-      "Built around an ESP32-based tide gauge concept using accessible components and practical deployment.",
+      "Built around a microcontroller-based tide gauge using non-contact ultrasonic sensing for high accuracy and minimal maintenance.",
   },
 ];
