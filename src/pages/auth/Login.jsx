@@ -31,12 +31,12 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-surface text-on-surface font-manrope flex flex-col">
-      <main className="relative flex-1 overflow-hidden px-6 py-12 flex items-center justify-center">
+      <main className="relative flex-1 overflow-hidden md:px-6 py-12 flex items-center justify-center">
         <BackgroundGlow />
 
         <div className="relative z-10 w-full max-w-110">
           <BrandHeader />
-          <div className="rounded-2xl border border-white/60 bg-white/75 p-8 shadow-[0_8px_24px_rgba(23,28,31,0.06)] backdrop-blur-md md:p-10">
+          <div className="rounded-4xl border border-white/60 bg-white/75 px-5 py-8 shadow-[0_8px_24px_rgba(23,28,31,0.06)] backdrop-blur-md md:p-10">
             <h2 className="mb-8 text-xl font-bold text-on-surface">
               Welcome back
             </h2>

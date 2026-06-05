@@ -46,15 +46,15 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen bg-surface text-on-surface font-manrope flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-surface text-on-surface font-manrope flex flex-col items-center justify-center md:px-6 py-12 relative overflow-hidden">
       <BackgroundGlow />
 
-      <main className="w-full max-w-120">
+      <main className="w-full max-w-full md:max-w-120">
         <BrandHeader />
 
         <section className="rounded-4xl bg-surface-container-lowest/90 p-8 shadow-[0_8px_24px_rgba(23,28,31,0.06)] backdrop-blur-xl transition-all duration-300 md:p-10">
           <div className="mb-8">
-            <h2 className="mb-2 text-2xl font-bold text-on-surface">
+            <h2 className="mb-2 text-xl md:text-2xl font-bold text-on-surface">
               Create an account
             </h2>
             <p className="text-sm text-on-surface-variant">
