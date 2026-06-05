@@ -132,12 +132,12 @@ export default function RegularDashboard() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex h-3 w-3 rounded-full bg-emerald-500" />
               </span>
-              <span className="text-sm font-bold uppercase tracking-[0.2em] text-on-surface-variant">
+              <span className="text-xs font-bold uppercase tracking-[0.2em] text-on-surface-variant">
                 Live system monitoring
               </span>
             </div>
 
-            <h1 className="text-4xl font-black tracking-tight text-primary md:text-6xl">
+            <h1 className="text-2xl font-black tracking-tight text-primary md:text-6xl">
               Coastal Station 01
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-on-surface-variant md:text-lg">
@@ -154,9 +154,9 @@ export default function RegularDashboard() {
                   <p className="text-xs font-bold uppercase tracking-[0.22em] text-on-surface-variant">
                     Current status
                   </p>
-                  <div className="mt-3 flex items-center gap-3">
+                  <div className="mt-3 flex flex-col items-start md:items-center md:flex-row gap-3">
                     <StatusPill label="Safe" />
-                    <span className="text-sm font-semibold text-on-surface-variant">
+                    <span className="text-xs font-semibold text-on-surface-variant">
                       Updated 2 mins ago
                     </span>
                   </div>
@@ -194,7 +194,7 @@ export default function RegularDashboard() {
                 <p className="text-xs font-bold uppercase tracking-[0.22em] text-on-surface-variant">
                   Tide trend
                 </p>
-                <h2 className="mt-2 text-2xl font-black tracking-tight text-primary md:text-3xl">
+                <h2 className="mt-2 text-xl font-black tracking-tight text-primary md:text-3xl">
                   Water level over time
                 </h2>
               </div>
@@ -204,7 +204,7 @@ export default function RegularDashboard() {
               </div>
             </div>
 
-            <div className="h-[320px] w-full">
+            <div className="h-80 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   data={tideData}
@@ -304,7 +304,7 @@ export default function RegularDashboard() {
                     2 mins ago
                   </span>
                 </div>
-                <div className="flex items-center justify-between rounded-2xl bg-surface-container-low px-4 py-3">
+                <div className="flex items-center justify-between rounded-2xl bg-surface-container-low px-4 py-3 gap-20">
                   <span className="text-sm font-semibold text-on-surface-variant">
                     Source
                   </span>

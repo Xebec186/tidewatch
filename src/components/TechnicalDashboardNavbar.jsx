@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { LuWaves, LuBellRing, LuCircleUser, LuLogOut, LuMenu, LuX } from "react-icons/lu";
+import {
+  LuWaves,
+  LuBellRing,
+  LuCircleUser,
+  LuLogOut,
+  LuMenu,
+  LuX,
+} from "react-icons/lu";
 import { useAuth } from "../context/AuthContext";
 
 export default function TechnicalDashboardNavbar({ onNotificationToggle }) {
@@ -27,9 +34,11 @@ export default function TechnicalDashboardNavbar({ onNotificationToggle }) {
   };
 
   return (
-    <header className={`sticky top-0 z-50 border-b border-outline-variant/20 transition-colors duration-300 ${
-      isMenuOpen ? "bg-surface" : "bg-surface/85 backdrop-blur-md"
-    }`}>
+    <header
+      className={`sticky top-0 z-50 border-b border-outline-variant/20 transition-colors duration-300 ${
+        isMenuOpen ? "bg-surface" : "bg-surface/85 backdrop-blur-md"
+      }`}
+    >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <Link to="/dashboard" className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-on-primary shadow-lg shadow-primary/10">
@@ -46,7 +55,10 @@ export default function TechnicalDashboardNavbar({ onNotificationToggle }) {
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
-          <a href="/dashboard#analytics" className="text-sm font-medium text-primary">
+          <a
+            href="/dashboard#analytics"
+            className="text-sm font-medium text-primary"
+          >
             Analytics
           </a>
           <a
@@ -64,16 +76,6 @@ export default function TechnicalDashboardNavbar({ onNotificationToggle }) {
         </nav>
 
         <div className="flex items-center gap-3">
-          <div className="hidden items-center gap-2 rounded-full bg-tertiary-container/10 px-3 py-1.5 text-primary md:flex">
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-primary" />
-            </span>
-            <span className="text-[10px] font-bold uppercase tracking-[0.24em]">
-              Live
-            </span>
-          </div>
-
           <div className="hidden items-center gap-3 md:flex">
             <button
               onClick={handleNotifClick}
@@ -115,23 +117,13 @@ export default function TechnicalDashboardNavbar({ onNotificationToggle }) {
 
       {/* Mobile Menu */}
       <div
-        className={`fixed inset-x-0 top-[73px] bottom-0 z-40 bg-surface shadow-2xl transition-all duration-300 md:hidden ${
-          isMenuOpen 
-            ? "translate-y-0 opacity-100" 
+        className={`fixed inset-x-0 top-18.25 bottom-0 z-40 bg-surface shadow-2xl transition-all duration-100 md:hidden ${
+          isMenuOpen
+            ? "translate-y-0 opacity-100"
             : "-translate-y-4 opacity-0 pointer-events-none"
         }`}
       >
         <div className="flex flex-col gap-4 p-6">
-          <div className="flex items-center gap-2 rounded-full bg-tertiary-container/10 px-3 py-1.5 text-primary self-start">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
-            </span>
-            <span className="text-[10px] font-bold uppercase tracking-[0.24em]">
-              System Live
-            </span>
-          </div>
-
           <nav className="flex flex-col gap-4">
             <a
               href="/dashboard#analytics"

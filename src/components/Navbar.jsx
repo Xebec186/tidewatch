@@ -93,7 +93,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       <div
-        className={`fixed inset-x-0 top-19 bottom-0 z-40 bg-surface shadow-2xl transition-all duration-300 md:hidden ${
+        className={`fixed inset-x-0 top-19 bottom-0 z-40 bg-surface shadow-2xl transition-all duration-100 md:hidden ${
           isMenuOpen
             ? "translate-y-0 opacity-100"
             : "-translate-y-4 opacity-0 pointer-events-none"
