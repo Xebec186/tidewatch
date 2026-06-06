@@ -34,10 +34,6 @@ export default function DashboardNavbar({ onNotificationToggle }) {
   };
 
   const scrollToSection = (id) => {
-    if (window.location.pathname !== "/dashboard") {
-      navigate(`/dashboard#${id}`);
-      return;
-    }
     const element = document.getElementById(id);
     if (element) {
       const offset = 80; // Offset for sticky header
@@ -46,7 +42,7 @@ export default function DashboardNavbar({ onNotificationToggle }) {
 
       window.scrollTo({
         top: offsetPosition,
-        behavior: "smooth"
+        behavior: "smooth",
       });
     }
     setIsMenuOpen(false);
@@ -87,7 +83,7 @@ export default function DashboardNavbar({ onNotificationToggle }) {
             Charts
           </button>
           <button
-            onClick={() => scrollToSection("logs")}
+            onClick={() => scrollToSection("alerts")}
             className="cursor-pointer text-sm font-medium text-on-surface-variant transition-colors hover:text-primary"
           >
             Activity
@@ -157,7 +153,7 @@ export default function DashboardNavbar({ onNotificationToggle }) {
               Charts
             </button>
             <button
-              onClick={() => scrollToSection("logs")}
+              onClick={() => scrollToSection("alerts")}
               className="text-left text-base font-semibold text-on-surface-variant transition-colors hover:text-primary"
             >
               Activity

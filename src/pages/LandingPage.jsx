@@ -7,10 +7,14 @@ import { audience } from "../data/audience";
 import { useTelemetry } from "../context/ThingsBoardContext";
 
 export default function LandingPage() {
-  const { telemetry, attributes, isConnected, latestTs, isLoading } = useTelemetry();
+  const { telemetry, attributes, isConnected, latestTs, isLoading } =
+    useTelemetry();
 
   // Prioritize ThingsBoard's official 'active' attribute, fallback to recent telemetry
-  const isDeviceActive = isConnected && (attributes.active === true || (latestTs && (Date.now() - latestTs < 600000)));
+  const isDeviceActive =
+    isConnected &&
+    (attributes.active === true ||
+      (latestTs && Date.now() - latestTs < 600000));
 
   const getLatest = (key, fallback = "--") => {
     if (telemetry[key] && telemetry[key].length > 0) {
@@ -20,9 +24,10 @@ export default function LandingPage() {
   };
 
   const currentTideRaw = getLatest("tide_m");
-  const currentTide = currentTideRaw !== "--" && !isNaN(parseFloat(currentTideRaw)) 
-    ? parseFloat(currentTideRaw).toFixed(2) 
-    : "--";
+  const currentTide =
+    currentTideRaw !== "--" && !isNaN(parseFloat(currentTideRaw))
+      ? parseFloat(currentTideRaw).toFixed(2)
+      : "--";
   return (
     <div className="min-h-screen bg-surface text-on-surface font-manrope selection:bg-primary-container selection:text-on-primary-container">
       <main className="relative overflow-hidden">
@@ -38,7 +43,14 @@ export default function LandingPage() {
               <span
                 className={`h-2 w-2 rounded-full ${isLoading ? "bg-on-surface-variant/30 animate-pulse" : isDeviceActive ? "bg-primary animate-pulse" : "bg-error"}`}
               />
-              System status: {isLoading ? "checking..." : isDeviceActive ? "active" : isConnected ? "standby" : "offline"}
+              System status:{" "}
+              {isLoading
+                ? "checking..."
+                : isDeviceActive
+                  ? "active"
+                  : isConnected
+                    ? "standby"
+                    : "offline"}
             </div>
 
             <h1 className="max-w-3xl text-4xl font-extrabold tracking-tight text-primary md:text-6xl lg:text-7xl">
@@ -104,7 +116,11 @@ export default function LandingPage() {
                   <div
                     className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] ${isDeviceActive ? "bg-tertiary-container text-on-tertiary-container" : "bg-error-container text-on-error-container"}`}
                   >
-                    {isDeviceActive ? "Live Stream" : isConnected ? "Standby" : "Station Offline"}
+                    {isDeviceActive
+                      ? "Live Stream"
+                      : isConnected
+                        ? "Standby"
+                        : "Station Offline"}
                   </div>
                 </div>
 
