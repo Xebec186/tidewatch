@@ -23,21 +23,6 @@ import {
 import MetricCard from "../../components/MetricCard";
 import StatusPill from "../../components/StatusPill";
 
-// Utility to format ThingsBoard data for Recharts
-const formatTelemetry = (telemetry, key) => {
-  if (!telemetry[key]) return [];
-  return telemetry[key]
-    .map(([ts, val]) => ({
-      time: new Date(ts).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      value: parseFloat(val),
-      ts,
-    }))
-    .reverse();
-};
-
 export default function MainDashboard() {
   const { telemetry, attributes, isConnected, latestTs, isLoading } =
     useTelemetry();
@@ -83,44 +68,70 @@ export default function MainDashboard() {
   }, [telemetry]);
 
   const formatVal = (val, decimals = 2) => {
-    const num = parseFloat(val);
-    return isNaN(num) ? val : num.toFixed(decimals);
+    if (val === null || val === undefined || isNaN(parseFloat(val))) return "--";
+    return parseFloat(val).toFixed(decimals);
   };
 
-  // Format data for chart with dual axis
+  // 10-second Windowed Event Grouping
   const chartData = useMemo(() => {
     const tideReadings = telemetry["tide_m"] || [];
     const distReadings = telemetry["distance_cm"] || [];
 
-    // Create a map of timestamps to values for efficient lookup
-    const dataMap = new Map();
+    // Flatten all readings into a single stream
+    const flatStream = [
+      ...tideReadings.map(([ts, val]) => ({ ts, type: "tide", val: parseFloat(val) })),
+      ...distReadings.map(([ts, val]) => ({ ts, type: "dist", val: parseFloat(val) })),
+    ].sort((a, b) => a.ts - b.ts);
 
-    tideReadings.forEach(([ts, val]) => {
-      dataMap.set(ts, { ts, tide: parseFloat(val), distance: null });
-    });
+    if (flatStream.length === 0) return [];
 
-    distReadings.forEach(([ts, val]) => {
-      // Find the closest tide timestamp within 2 seconds if not exact match
-      let targetTs = ts;
-      if (!dataMap.has(ts)) {
-        for (const existingTs of dataMap.keys()) {
-          if (Math.abs(existingTs - ts) < 2000) {
-            targetTs = existingTs;
-            break;
-          }
+    const grouped = [];
+    let currentGroup = null;
+    const WINDOW_MS = 10000; // 10 second tolerance
+
+    flatStream.forEach((reading) => {
+      if (!currentGroup || reading.ts - currentGroup.startTs > WINDOW_MS) {
+        // Finalize previous group if it exists
+        if (currentGroup) {
+          grouped.push({
+            ts: currentGroup.maxTs,
+            tide: currentGroup.tide.length > 0 
+              ? currentGroup.tide.reduce((a, b) => a + b, 0) / currentGroup.tide.length 
+              : null,
+            distance: currentGroup.dist.length > 0 
+              ? currentGroup.dist.reduce((a, b) => a + b, 0) / currentGroup.dist.length 
+              : null,
+          });
         }
-      }
-
-      if (dataMap.has(targetTs)) {
-        dataMap.get(targetTs).distance = parseFloat(val);
+        // Start new group
+        currentGroup = {
+          startTs: reading.ts,
+          maxTs: reading.ts,
+          tide: reading.type === "tide" ? [reading.val] : [],
+          dist: reading.type === "dist" ? [reading.val] : [],
+        };
       } else {
-        dataMap.set(ts, { ts, tide: null, distance: parseFloat(val) });
+        // Add to current group
+        if (reading.type === "tide") currentGroup.tide.push(reading.val);
+        if (reading.type === "dist") currentGroup.dist.push(reading.val);
+        currentGroup.maxTs = Math.max(currentGroup.maxTs, reading.ts);
       }
     });
 
-    // Convert map to array, sort OLDER to NEWER for chart
-    return Array.from(dataMap.values())
-      .sort((a, b) => a.ts - b.ts);
+    // Push the final group
+    if (currentGroup) {
+      grouped.push({
+        ts: currentGroup.maxTs,
+        tide: currentGroup.tide.length > 0 
+          ? currentGroup.tide.reduce((a, b) => a + b, 0) / currentGroup.tide.length 
+          : null,
+        distance: currentGroup.dist.length > 0 
+          ? currentGroup.dist.reduce((a, b) => a + b, 0) / currentGroup.dist.length 
+          : null,
+      });
+    }
+
+    return grouped;
   }, [telemetry]);
 
   // Derived data for display
@@ -131,8 +142,8 @@ export default function MainDashboard() {
         hour: "2-digit",
         minute: "2-digit",
       }),
-      tideLabel: item.tide !== null ? item.tide.toFixed(2) : "--",
-      distanceLabel: item.distance !== null ? item.distance.toFixed(1) : "--",
+      tideLabel: formatVal(item.tide, 2),
+      distanceLabel: formatVal(item.distance, 1),
     }));
   }, [chartData]);
 
@@ -256,7 +267,7 @@ export default function MainDashboard() {
         >
           <MetricCard
             label="Current Tide"
-            value={`${formatVal(level)} m`}
+            value={`${formatVal(level, 2)} m`}
             helper="Water level reading"
             icon={LuWaves}
             trend={tideTrend}
@@ -474,7 +485,7 @@ export default function MainDashboard() {
                   <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">
                     Distance (cm)
                   </th>
-                  <th className="px-6 py-4 text-[10px) font-black uppercase tracking-widest text-on-surface-variant">
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">
                     Tide Level (m)
                   </th>
                 </tr>
@@ -499,7 +510,7 @@ export default function MainDashboard() {
                 {displayData.length === 0 && (
                   <tr>
                     <td
-                      colSpan={4}
+                      colSpan={3}
                       className="px-6 py-12 text-center text-sm font-medium text-on-surface-variant italic"
                     >
                       Waiting for field node to push telemetry...
@@ -538,7 +549,6 @@ export default function MainDashboard() {
               </div>
             ))}
 
-            {/* System default logs if no data */}
             <div className="rounded-2xl bg-surface-container-low px-4 py-4 opacity-60">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
