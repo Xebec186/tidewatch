@@ -4,7 +4,6 @@ import {
   LuGauge,
   LuShieldCheck,
   LuWaves,
-  LuFilter,
   LuDownload,
   LuClipboardList,
   LuTrendingUp,
@@ -90,24 +89,60 @@ export default function MainDashboard() {
 
   // Format data for chart with dual axis
   const chartData = useMemo(() => {
-    const tideReadings = formatTelemetry(telemetry, "tide_m");
-    return tideReadings.map((item) => {
-      const dVal = telemetry["distance_cm"]?.find((d) => d[0] === item.ts)?.[1];
-      return {
-        ...item,
-        tide: item.value,
-        distance: dVal ? parseFloat(dVal) : null,
-      };
+    const tideReadings = telemetry["tide_m"] || [];
+    const distReadings = telemetry["distance_cm"] || [];
+
+    // Create a map of timestamps to values for efficient lookup
+    const dataMap = new Map();
+
+    tideReadings.forEach(([ts, val]) => {
+      dataMap.set(ts, { ts, tide: parseFloat(val), distance: null });
     });
+
+    distReadings.forEach(([ts, val]) => {
+      // Find the closest tide timestamp within 2 seconds if not exact match
+      let targetTs = ts;
+      if (!dataMap.has(ts)) {
+        for (const existingTs of dataMap.keys()) {
+          if (Math.abs(existingTs - ts) < 2000) {
+            targetTs = existingTs;
+            break;
+          }
+        }
+      }
+
+      if (dataMap.has(targetTs)) {
+        dataMap.get(targetTs).distance = parseFloat(val);
+      } else {
+        dataMap.set(ts, { ts, tide: null, distance: parseFloat(val) });
+      }
+    });
+
+    // Convert map to array, sort OLDER to NEWER for chart
+    return Array.from(dataMap.values())
+      .sort((a, b) => a.ts - b.ts);
   }, [telemetry]);
 
+  // Derived data for display
+  const displayData = useMemo(() => {
+    return chartData.map((item) => ({
+      ...item,
+      time: new Date(item.ts).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      tideLabel: item.tide !== null ? item.tide.toFixed(2) : "--",
+      distanceLabel: item.distance !== null ? item.distance.toFixed(1) : "--",
+    }));
+  }, [chartData]);
+
   const downloadCSV = () => {
-    if (chartData.length === 0) return;
+    if (displayData.length === 0) return;
     const headers = ["Timestamp", "Tide Level (m)", "Sensor Distance (cm)"];
-    const rows = chartData.map((d) => [
+    const rows = displayData.map((d) => [
       new Date(d.ts).toLocaleString(),
-      d.tide,
-      d.distance,
+      d.tideLabel,
+      d.distanceLabel,
     ]);
     const csvContent =
       "data:text/csv;charset=utf-8," +
@@ -228,7 +263,7 @@ export default function MainDashboard() {
           />
           <MetricCard
             label="Sensor Distance"
-            value={`${formatVal(distance)} cm`}
+            value={`${formatVal(distance, 1)} cm`}
             helper="Ultrasonic return"
             icon={LuGauge}
           />
@@ -278,11 +313,11 @@ export default function MainDashboard() {
               </div>
             </div>
 
-            <div className="h-85 w-full">
+            <div className="h-64 sm:h-80 md:h-96 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
-                  data={chartData}
-                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                  data={displayData}
+                  margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
                 >
                   <CartesianGrid
                     strokeDasharray="4 4"
@@ -293,36 +328,23 @@ export default function MainDashboard() {
                     dataKey="time"
                     tickLine={false}
                     axisLine={false}
-                    tick={{ fill: "#3f484b", fontSize: 12 }}
+                    tick={{ fill: "#3f484b", fontSize: 10 }}
+                    minTickGap={30}
                   />
                   <YAxis
                     yId="left"
                     tickLine={false}
                     axisLine={false}
-                    tick={{ fill: "#3f484b", fontSize: 12 }}
-                    label={{
-                      value: "Tide (m)",
-                      angle: -90,
-                      position: "insideLeft",
-                      offset: 10,
-                      fill: "#004451",
-                      fontWeight: "bold",
-                    }}
+                    tick={{ fill: "#004451", fontSize: 10, fontWeight: "bold" }}
+                    width={40}
                   />
                   <YAxis
                     yId="right"
                     orientation="right"
                     tickLine={false}
                     axisLine={false}
-                    tick={{ fill: "#3f484b", fontSize: 12 }}
-                    label={{
-                      value: "Dist (cm)",
-                      angle: 90,
-                      position: "insideRight",
-                      offset: 10,
-                      fill: "#8cd1e4",
-                      fontWeight: "bold",
-                    }}
+                    tick={{ fill: "#8cd1e4", fontSize: 10, fontWeight: "bold" }}
+                    width={40}
                   />
                   <Tooltip
                     contentStyle={{
@@ -330,17 +352,20 @@ export default function MainDashboard() {
                       border: "1px solid rgba(191, 200, 203, 0.35)",
                       background: "#ffffff",
                       boxShadow: "0 8px 24px rgba(23, 28, 31, 0.08)",
+                      fontSize: "12px",
                     }}
                   />
-                  <Legend />
+                  <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }} />
                   <Line
                     yId="left"
                     type="monotone"
                     dataKey="tide"
                     name="Tide Level (m)"
                     stroke="#004451"
-                    strokeWidth={4}
-                    dot={{ r: 4, strokeWidth: 0, fill: "#004451" }}
+                    strokeWidth={3}
+                    dot={{ r: 3, strokeWidth: 0, fill: "#004451" }}
+                    activeDot={{ r: 5 }}
+                    connectNulls
                   />
                   <Line
                     yId="right"
@@ -350,7 +375,9 @@ export default function MainDashboard() {
                     stroke="#8cd1e4"
                     strokeWidth={2}
                     strokeDasharray="5 5"
-                    dot={{ r: 3, strokeWidth: 0, fill: "#8cd1e4" }}
+                    dot={{ r: 2, strokeWidth: 0, fill: "#8cd1e4" }}
+                    activeDot={{ r: 4 }}
+                    connectNulls
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -412,7 +439,7 @@ export default function MainDashboard() {
               <button
                 type="button"
                 onClick={downloadCSV}
-                disabled={chartData.length === 0}
+                disabled={displayData.length === 0}
                 className="mt-6 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-surface px-5 py-3.5 font-bold text-primary transition-all hover:bg-primary-fixed active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Download CSV
@@ -435,12 +462,6 @@ export default function MainDashboard() {
                 Recent Records
               </h2>
             </div>
-            <div className="flex items-center gap-2 rounded-xl bg-surface-container-low px-3 py-2 text-on-surface-variant">
-              <LuFilter size={16} />
-              <span className="text-xs font-bold uppercase tracking-[0.22em]">
-                Filter
-              </span>
-            </div>
           </div>
 
           <div className="overflow-x-auto">
@@ -453,16 +474,13 @@ export default function MainDashboard() {
                   <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">
                     Distance (cm)
                   </th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">
+                  <th className="px-6 py-4 text-[10px) font-black uppercase tracking-widest text-on-surface-variant">
                     Tide Level (m)
-                  </th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant text-center">
-                    Status
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/10">
-                {chartData.slice(0, 10).map((row) => (
+                {[...displayData].reverse().slice(0, 10).map((row) => (
                   <tr
                     key={row.ts}
                     className="transition-colors hover:bg-surface-container-low/50"
@@ -471,19 +489,14 @@ export default function MainDashboard() {
                       {new Date(row.ts).toLocaleString()}
                     </td>
                     <td className="px-6 py-4 text-xs font-bold text-primary">
-                      {row.distance?.toFixed(1) || "--"}
+                      {row.distanceLabel}
                     </td>
                     <td className="px-6 py-4 text-xs font-bold text-primary">
-                      {row.tide?.toFixed(2) || "--"}
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <span className="rounded-full bg-tertiary-container/20 px-2 py-0.5 text-[9px] font-black uppercase text-tertiary">
-                        OK
-                      </span>
+                      {row.tideLabel}
                     </td>
                   </tr>
                 ))}
-                {chartData.length === 0 && (
+                {displayData.length === 0 && (
                   <tr>
                     <td
                       colSpan={4}
@@ -506,7 +519,7 @@ export default function MainDashboard() {
             Activity Stream
           </p>
           <div className="mt-6 space-y-4">
-            {chartData.slice(0, 5).map((row) => (
+            {[...displayData].reverse().slice(0, 5).map((row) => (
               <div
                 key={row.ts}
                 className="rounded-2xl bg-surface-container-low px-4 py-4"
@@ -515,15 +528,7 @@ export default function MainDashboard() {
                   <div className="flex items-center gap-3">
                     <StatusPill>Reading</StatusPill>
                     <p className="text-sm font-bold text-on-surface">
-                      New telemetry received:{" "}
-                      {typeof row.tide === "number"
-                        ? row.tide.toFixed(2)
-                        : "--"}
-                      m (Dist:{" "}
-                      {typeof row.distance === "number"
-                        ? row.distance.toFixed(1)
-                        : "--"}
-                      cm)
+                      New telemetry received: {row.tideLabel}m (Dist: {row.distanceLabel}cm)
                     </p>
                   </div>
                   <span className="text-xs font-bold uppercase tracking-[0.22em] text-on-surface-variant">
