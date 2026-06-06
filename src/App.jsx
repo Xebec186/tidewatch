@@ -7,17 +7,20 @@ import SimpleLayout from "./layouts/SimpleLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 import { ThingsBoardProvider } from "./context/ThingsBoardContext";
+
+// Standard imports for core landing and static pages (better SEO/initial paint)
+import LandingPage from "./pages/LandingPage";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import ContactSupport from "./pages/ContactSupport";
+import ProfilePage from "./pages/ProfilePage";
+
 import "./App.css";
 
-// Lazy load page components
+// Lazy load larger/authenticated modules
 const Login = lazy(() => import("./pages/auth/Login"));
 const Signup = lazy(() => import("./pages/auth/Signup"));
-const LandingPage = lazy(() => import("./pages/LandingPage"));
 const MainDashboard = lazy(() => import("./pages/dashboard/MainDashboard"));
-const ProfilePage = lazy(() => import("./pages/ProfilePage"));
-const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
-const TermsOfService = lazy(() => import("./pages/TermsOfService"));
-const ContactSupport = lazy(() => import("./pages/ContactSupport"));
 
 function App() {
   return (
@@ -37,20 +40,20 @@ function App() {
                 <Route path="/" element={<LandingPage />} />
               </Route>
 
-              {/* Auth Routes */}
+              {/* Auth Routes - Lazy Loaded */}
               <Route element={<AuthLayout />}>
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
               </Route>
 
-              {/* Dashboard Route with Sidebar/Dashboard Navbar */}
+              {/* Dashboard Route - Lazy Loaded for security and bundle size */}
               <Route element={<ProtectedRoute />}>
                 <Route element={<DashboardLayout />}>
                   <Route path="/dashboard" element={<MainDashboard />} />
                 </Route>
               </Route>
 
-              {/* Simple Routes (Privacy, Terms, Support, Profile) */}
+              {/* Simple Routes - Standard Imports */}
               <Route element={<SimpleLayout />}>
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/terms" element={<TermsOfService />} />
