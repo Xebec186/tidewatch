@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   LuWaves,
@@ -9,11 +9,27 @@ import {
   LuX,
 } from "react-icons/lu";
 import { useAuth } from "../context/AuthContext";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase";
 
 export default function DashboardNavbar({ onNotificationToggle }) {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const q = query(
+      collection(db, "notifications"),
+      where("read", "==", false)
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setUnreadCount(snapshot.size);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -95,10 +111,16 @@ export default function DashboardNavbar({ onNotificationToggle }) {
             <button
               onClick={handleNotifClick}
               type="button"
-              className="inline-flex cursor-pointer items-center justify-center rounded-xl p-2 text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-primary"
+              className="relative inline-flex cursor-pointer items-center justify-center rounded-xl p-2 text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-primary"
               aria-label="Notifications"
             >
               <LuBellRing size={20} />
+              {unreadCount > 0 && (
+                <span className="absolute top-1 right-1 flex h-2.5 w-2.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-error opacity-75"></span>
+                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-error"></span>
+                </span>
+              )}
             </button>
             <Link to="/profile">
               <button
@@ -165,10 +187,15 @@ export default function DashboardNavbar({ onNotificationToggle }) {
           <div className="flex flex-col gap-3">
             <button
               onClick={handleNotifClick}
-              className="flex items-center gap-3 rounded-xl border border-outline-variant/30 p-3 text-left text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-primary"
+              className="relative flex items-center gap-3 rounded-xl border border-outline-variant/30 p-3 text-left text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-primary"
             >
               <LuBellRing size={18} />
               <span className="text-sm font-semibold">Notifications</span>
+              {unreadCount > 0 && (
+                <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-error text-[10px] font-bold text-on-error">
+                  {unreadCount}
+                </span>
+              )}
             </button>
             <Link
               to="/profile"
