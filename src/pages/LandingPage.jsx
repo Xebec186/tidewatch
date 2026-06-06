@@ -7,7 +7,10 @@ import { audience } from "../data/audience";
 import { useTelemetry } from "../context/ThingsBoardContext";
 
 export default function LandingPage() {
-  const { telemetry, isConnected } = useTelemetry();
+  const { telemetry, attributes, isConnected, latestTs, isLoading } = useTelemetry();
+
+  // Prioritize ThingsBoard's official 'active' attribute, fallback to recent telemetry
+  const isDeviceActive = isConnected && (attributes.active === true || (latestTs && (Date.now() - latestTs < 600000)));
 
   const getLatest = (key, fallback = "--") => {
     if (telemetry[key] && telemetry[key].length > 0) {
@@ -30,12 +33,12 @@ export default function LandingPage() {
         <section className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-14 px-6 pb-24 pt-8 lg:grid-cols-12">
           <div className="lg:col-span-7">
             <div
-              className={`mb-6 inline-flex items-center gap-2 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] ${isConnected ? "bg-secondary-container text-on-secondary-fixed-variant" : "bg-error-container text-on-error-container"}`}
+              className={`mb-6 inline-flex items-center gap-2 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] ${isLoading ? "bg-surface-container-highest text-on-surface-variant" : isDeviceActive ? "bg-secondary-container text-on-secondary-fixed-variant" : "bg-error-container text-on-error-container"}`}
             >
               <span
-                className={`h-2 w-2 rounded-full ${isConnected ? "bg-primary animate-pulse" : "bg-error"}`}
+                className={`h-2 w-2 rounded-full ${isLoading ? "bg-on-surface-variant/30 animate-pulse" : isDeviceActive ? "bg-primary animate-pulse" : "bg-error"}`}
               />
-              System status: {isConnected ? "active" : "offline"}
+              System status: {isLoading ? "checking..." : isDeviceActive ? "active" : isConnected ? "standby" : "offline"}
             </div>
 
             <h1 className="max-w-3xl text-4xl font-extrabold tracking-tight text-primary md:text-6xl lg:text-7xl">
@@ -99,15 +102,15 @@ export default function LandingPage() {
                     </div>
                   </div>
                   <div
-                    className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] ${isConnected ? "bg-tertiary-container text-on-tertiary-container" : "bg-error-container text-on-error-container"}`}
+                    className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] ${isDeviceActive ? "bg-tertiary-container text-on-tertiary-container" : "bg-error-container text-on-error-container"}`}
                   >
-                    {isConnected ? "Live Stream" : "Station Offline"}
+                    {isDeviceActive ? "Live Stream" : isConnected ? "Standby" : "Station Offline"}
                   </div>
                 </div>
 
                 <div className="relative h-28 overflow-hidden rounded-2xl bg-surface-container-low">
                   <svg
-                    className={`absolute inset-0 h-full w-full ${isConnected ? "animate-pulse" : ""}`}
+                    className={`absolute inset-0 h-full w-full ${isDeviceActive ? "animate-pulse" : ""}`}
                     viewBox="0 0 400 100"
                     preserveAspectRatio="none"
                     aria-hidden="true"
@@ -149,9 +152,9 @@ export default function LandingPage() {
                   Monitoring
                 </p>
                 <p
-                  className={`mt-2 text-2xl font-black ${isConnected ? "text-primary" : "text-on-surface-variant"}`}
+                  className={`mt-2 text-2xl font-black ${isDeviceActive ? "text-primary" : "text-on-surface-variant"}`}
                 >
-                  {isConnected ? "Active" : "---"}
+                  {isDeviceActive ? "Active" : "---"}
                 </p>
               </div>
 
@@ -161,9 +164,9 @@ export default function LandingPage() {
                   Device mode
                 </p>
                 <p
-                  className={`mt-2 text-2xl font-black ${isConnected ? "text-primary" : "text-error"}`}
+                  className={`mt-2 text-2xl font-black ${isDeviceActive ? "text-primary" : "text-error"}`}
                 >
-                  {isConnected ? "Online" : "Offline"}
+                  {isDeviceActive ? "Online" : "Offline"}
                 </p>
               </div>
             </div>

@@ -40,7 +40,10 @@ const formatTelemetry = (telemetry, key) => {
 };
 
 export default function MainDashboard() {
-  const { telemetry, isConnected, latestTs } = useTelemetry();
+  const { telemetry, attributes, isConnected, latestTs, isLoading } = useTelemetry();
+
+  // Prioritize ThingsBoard's official 'active' attribute, fallback to recent telemetry
+  const isDeviceActive = isConnected && (attributes.active === true || (latestTs && (Date.now() - latestTs < 600000)));
 
   const getLatest = (key, fallback = "--") => {
     if (telemetry[key] && telemetry[key].length > 0) {
@@ -133,7 +136,12 @@ export default function MainDashboard() {
               <span className="text-sm font-bold uppercase tracking-[0.2em] text-on-surface-variant">
                 Live Data Monitor
               </span>
-              {isConnected && (
+              {isLoading ? (
+                <span className="flex items-center gap-1.5 rounded-full bg-surface-container-high px-2 py-0.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest animate-pulse">
+                  <span className="h-1.5 w-1.5 rounded-full bg-on-surface-variant/30" />
+                  Checking...
+                </span>
+              ) : isDeviceActive && (
                 <span className="flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-600 uppercase tracking-widest animate-pulse">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                   Live
@@ -159,7 +167,7 @@ export default function MainDashboard() {
                     Stream Health
                   </p>
                   <h2 className="mt-3 text-3xl font-black tracking-tight">
-                    {isConnected ? "Active" : "Offline"}
+                    {isLoading ? "Checking..." : isDeviceActive ? "Active" : isConnected ? "Standby" : "Offline"}
                   </h2>
                 </div>
                 <div className="rounded-full bg-on-primary/10 p-3">
@@ -181,7 +189,7 @@ export default function MainDashboard() {
                     Status
                   </span>
                   <span className="text-sm font-bold text-on-primary uppercase tracking-widest text-[10px]">
-                    {isConnected ? "Connected" : "Disconnected"}
+                    {isLoading ? "Checking..." : isDeviceActive ? "Online" : isConnected ? "Connected" : "Disconnected"}
                   </span>
                 </div>
               </div>
@@ -232,8 +240,8 @@ export default function MainDashboard() {
                 </h2>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <StatusPill tone={isConnected ? "safe" : "danger"}>
-                  {isConnected ? "Real-time" : "History"}
+                <StatusPill tone={isLoading ? "safe" : isDeviceActive ? "safe" : isConnected ? "warning" : "danger"}>
+                  {isLoading ? "Checking..." : isDeviceActive ? "Real-time" : "Standby"}
                 </StatusPill>
               </div>
             </div>

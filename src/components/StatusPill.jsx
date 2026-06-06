@@ -2,7 +2,9 @@ export default function StatusPill({ children, tone = "safe" }) {
   const styles =
     tone === "danger"
       ? "bg-error-container text-on-error-container"
-      : "bg-tertiary-container/10 text-primary";
+      : tone === "warning"
+        ? "bg-amber-100 text-amber-700"
+        : "bg-tertiary-container/10 text-primary";
 
   return (
     <span

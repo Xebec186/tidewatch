@@ -11,16 +11,7 @@ import {
   LuTrash2,
   LuTriangleAlert,
 } from "react-icons/lu";
-
-function SectionCard({ children, className = "" }) {
-  return (
-    <section
-      className={`rounded-[1.75rem] border border-outline-variant/10 bg-surface-container-lowest p-6 shadow-sm md:p-8 ${className}`}
-    >
-      {children}
-    </section>
-  );
-}
+import SectionCard from "../components/SectionCard";
 
 export default function ProfilePage() {
   const { user, updateUserProfile, updateUserPassword, deleteUserAccount } =

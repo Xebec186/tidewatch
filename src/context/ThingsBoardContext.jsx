@@ -15,8 +15,10 @@ const TB_REST_URL = `https://${TB_HOST}/api`;
 
 export function ThingsBoardProvider({ children }) {
   const [telemetry, setTelemetry] = useState({});
+  const [attributes, setAttributes] = useState({});
   const [latestTs, setLatestTs] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const ws = useRef(null);
@@ -27,18 +29,27 @@ export function ThingsBoardProvider({ children }) {
   const subscribeToDevice = useCallback((entityId, entityType = "DEVICE") => {
     if (!ws.current || ws.current.readyState !== WebSocket.OPEN) return;
 
-    const cmdId = cmdIdCounter.current++;
+    const tsCmdId = cmdIdCounter.current++;
+    const attrCmdId = cmdIdCounter.current++;
+    
     const subscribeCmd = {
       tsSubCmds: [
         {
           entityType,
           entityId,
           scope: "LATEST_TELEMETRY",
-          cmdId,
+          cmdId: tsCmdId,
         },
       ],
       historyCmds: [],
-      attrSubCmds: [],
+      attrSubCmds: [
+        {
+          entityType,
+          entityId,
+          scope: "SERVER_SCOPE",
+          cmdId: attrCmdId,
+        },
+      ],
     };
 
     ws.current.send(JSON.stringify(subscribeCmd));
@@ -53,6 +64,7 @@ export function ThingsBoardProvider({ children }) {
 
     ws.current.onopen = () => {
       setIsConnected(true);
+      setIsLoading(false);
       setError(null);
       console.log("ThingsBoard WebSocket Connected");
 
@@ -64,25 +76,44 @@ export function ThingsBoardProvider({ children }) {
 
     ws.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
+      
+      // Handle both telemetry and attribute updates
       if (data.data) {
-        setTelemetry((prev) => ({
-          ...prev,
-          ...data.data,
-        }));
+        setIsLoading(false);
+        // ThingsBoard Telemetry API returns 'subscriptionId' corresponding to 'cmdId'
+        const isAttrUpdate = data.subscriptionId % 2 === 0; // Based on our counter logic
 
-        const firstKey = Object.keys(data.data)[0];
-        if (firstKey && data.data[firstKey].length > 0) {
-          setLatestTs(data.data[firstKey][0][0]);
+        if (isAttrUpdate) {
+          const flattenedAttrs = {};
+          Object.keys(data.data).forEach(key => {
+            flattenedAttrs[key] = data.data[key][0][1];
+          });
+          setAttributes((prev) => ({
+            ...prev,
+            ...flattenedAttrs,
+          }));
+        } else {
+          setTelemetry((prev) => ({
+            ...prev,
+            ...data.data,
+          }));
+
+          const firstKey = Object.keys(data.data)[0];
+          if (firstKey && data.data[firstKey].length > 0) {
+            setLatestTs(data.data[firstKey][0][0]);
+          }
         }
       }
     };
 
     ws.current.onclose = () => {
       setIsConnected(false);
+      setIsLoading(false);
       console.log("ThingsBoard WebSocket Disconnected");
     };
 
     ws.current.onerror = (err) => {
+      setIsLoading(false);
       setError("WebSocket Error");
       console.error("TB WS Error:", err);
     };
@@ -90,7 +121,8 @@ export function ThingsBoardProvider({ children }) {
 
   // 3. Declare login third
   const login = useCallback(async (username, password) => {
-    console.log("TB: Attempting login to", TB_REST_URL, "with user:", username);
+    setIsLoading(true);
+    console.log("TB: Attempting login to", TB_REST_URL);
     try {
       const response = await fetch(`${TB_REST_URL}/auth/login`, {
         method: "POST",
@@ -99,16 +131,18 @@ export function ThingsBoardProvider({ children }) {
       });
 
       if (!response.ok) {
+        setIsLoading(false);
         const errorData = await response.text();
         console.error("TB: Login failed status:", response.status, "Body:", errorData);
         throw new Error(`ThingsBoard login failed: ${response.status}`);
       }
 
       const data = await response.json();
-      console.log("TB: Login successful, token received");
+      console.log("TB: Login successful");
       token.current = data.token;
       connectWebSocket();
     } catch (err) {
+      setIsLoading(false);
       setError(err.message);
       console.error("TB: Connection process failed:", err);
     }
@@ -118,28 +152,15 @@ export function ThingsBoardProvider({ children }) {
   useEffect(() => {
     const tbUser = import.meta.env.VITE_THINGSBOARD_USERNAME;
     const tbPass = import.meta.env.VITE_THINGSBOARD_PASSWORD;
-    const tbHost = import.meta.env.VITE_THINGSBOARD_HOST || "thingsboard.cloud";
-    const tbDeviceId = import.meta.env.VITE_THINGSBOARD_DEVICE_ID;
-
-    console.log("TB Context: Initializing...");
-    console.log("TB Context: Env Check:", { 
-      hasUser: !!tbUser, 
-      hasPass: !!tbPass, 
-      host: tbHost,
-      hasDeviceId: !!tbDeviceId 
-    });
     
     if (tbUser && tbPass && !token.current) {
       login(tbUser, tbPass);
     } else {
-      if (!tbUser || !tbPass) {
-        console.warn("TB Context: Missing credentials in .env file. Connection skipped.");
-      }
+      setIsLoading(false);
     }
 
     return () => {
       if (ws.current) {
-        console.log("TB Context: Closing WebSocket on unmount");
         ws.current.close();
       }
     };
@@ -147,8 +168,10 @@ export function ThingsBoardProvider({ children }) {
 
   const value = {
     telemetry,
+    attributes,
     latestTs,
     isConnected,
+    isLoading,
     error,
     subscribeToDevice,
     login,
