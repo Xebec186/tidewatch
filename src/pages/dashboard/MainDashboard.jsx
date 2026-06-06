@@ -68,7 +68,8 @@ export default function MainDashboard() {
   }, [telemetry]);
 
   const formatVal = (val, decimals = 2) => {
-    if (val === null || val === undefined || isNaN(parseFloat(val))) return "--";
+    if (val === null || val === undefined || isNaN(parseFloat(val)))
+      return "--";
     return parseFloat(val).toFixed(decimals);
   };
 
@@ -79,8 +80,16 @@ export default function MainDashboard() {
 
     // Flatten all readings into a single stream
     const flatStream = [
-      ...tideReadings.map(([ts, val]) => ({ ts, type: "tide", val: parseFloat(val) })),
-      ...distReadings.map(([ts, val]) => ({ ts, type: "dist", val: parseFloat(val) })),
+      ...tideReadings.map(([ts, val]) => ({
+        ts,
+        type: "tide",
+        val: parseFloat(val),
+      })),
+      ...distReadings.map(([ts, val]) => ({
+        ts,
+        type: "dist",
+        val: parseFloat(val),
+      })),
     ].sort((a, b) => a.ts - b.ts);
 
     if (flatStream.length === 0) return [];
@@ -95,12 +104,16 @@ export default function MainDashboard() {
         if (currentGroup) {
           grouped.push({
             ts: currentGroup.maxTs,
-            tide: currentGroup.tide.length > 0 
-              ? currentGroup.tide.reduce((a, b) => a + b, 0) / currentGroup.tide.length 
-              : null,
-            distance: currentGroup.dist.length > 0 
-              ? currentGroup.dist.reduce((a, b) => a + b, 0) / currentGroup.dist.length 
-              : null,
+            tide:
+              currentGroup.tide.length > 0
+                ? currentGroup.tide.reduce((a, b) => a + b, 0) /
+                  currentGroup.tide.length
+                : null,
+            distance:
+              currentGroup.dist.length > 0
+                ? currentGroup.dist.reduce((a, b) => a + b, 0) /
+                  currentGroup.dist.length
+                : null,
           });
         }
         // Start new group
@@ -122,12 +135,16 @@ export default function MainDashboard() {
     if (currentGroup) {
       grouped.push({
         ts: currentGroup.maxTs,
-        tide: currentGroup.tide.length > 0 
-          ? currentGroup.tide.reduce((a, b) => a + b, 0) / currentGroup.tide.length 
-          : null,
-        distance: currentGroup.dist.length > 0 
-          ? currentGroup.dist.reduce((a, b) => a + b, 0) / currentGroup.dist.length 
-          : null,
+        tide:
+          currentGroup.tide.length > 0
+            ? currentGroup.tide.reduce((a, b) => a + b, 0) /
+              currentGroup.tide.length
+            : null,
+        distance:
+          currentGroup.dist.length > 0
+            ? currentGroup.dist.reduce((a, b) => a + b, 0) /
+              currentGroup.dist.length
+            : null,
       });
     }
 
@@ -178,10 +195,13 @@ export default function MainDashboard() {
     : "Never";
 
   return (
-    <div className="min-h-screen bg-surface text-on-surface font-manrope selection:bg-primary-fixed selection:text-on-primary-fixed">
-      <main className="mx-auto max-w-7xl px-6 py-8 md:py-10">
-        <section id="overview" className="mb-10 grid gap-8 lg:grid-cols-12">
-          <div className="lg:col-span-8">
+    <div className="min-h-screen w-full bg-surface text-on-surface font-manrope selection:bg-primary-fixed selection:text-on-primary-fixed">
+      <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 md:py-10">
+        <section
+          id="overview"
+          className="mb-8 grid grid-cols-1 gap-8 lg:grid-cols-12"
+        >
+          <div className="w-full lg:col-span-8">
             <div className="mb-4 flex items-center gap-3">
               <span className="text-sm font-bold uppercase tracking-[0.2em] text-on-surface-variant">
                 Live Data Monitor
@@ -201,17 +221,17 @@ export default function MainDashboard() {
               )}
             </div>
 
-            <h1 className="text-4xl font-black tracking-tight text-primary md:text-6xl">
+            <h1 className="text-3xl font-black tracking-tight text-primary sm:text-4xl md:text-6xl">
               Station Metrics
             </h1>
-            <p className="mt-4 max-w-2xl text-base leading-relaxed text-on-surface-variant md:text-lg">
+            <p className="mt-4 w-full text-base leading-relaxed text-on-surface-variant md:text-lg">
               Real-time tide monitoring powered by ultrasonic sensing. This
               dashboard tracks water levels and sensor performance directly from
               the field node.
             </p>
           </div>
 
-          <div className="lg:col-span-4">
+          <div className="w-full lg:col-span-4">
             <div className="rounded-[1.75rem] bg-primary p-6 text-on-primary shadow-lg shadow-primary/10 md:p-8">
               <div className="flex items-start justify-between gap-4">
                 <div>
@@ -263,7 +283,7 @@ export default function MainDashboard() {
 
         <section
           id="analytics"
-          className="mb-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
+          className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
         >
           <MetricCard
             label="Current Tide"
@@ -292,8 +312,8 @@ export default function MainDashboard() {
           />
         </section>
 
-        <section id="charts" className="grid gap-6 lg:grid-cols-12">
-          <div className="lg:col-span-8 rounded-[1.75rem] border border-outline-variant/10 bg-surface-container-lowest p-6 shadow-sm md:p-8">
+        <section id="charts" className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          <div className="w-full rounded-[1.75rem] border border-outline-variant/10 bg-surface-container-lowest p-4 shadow-sm sm:p-8 lg:col-span-8">
             <div className="mb-6 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.22em] text-on-surface-variant">
@@ -324,7 +344,7 @@ export default function MainDashboard() {
               </div>
             </div>
 
-            <div className="h-64 sm:h-80 md:h-96 w-full">
+            <div className="h-64 w-full sm:h-80 md:h-96">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   data={displayData}
@@ -366,7 +386,9 @@ export default function MainDashboard() {
                       fontSize: "12px",
                     }}
                   />
-                  <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }} />
+                  <Legend
+                    wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }}
+                  />
                   <Line
                     yId="left"
                     type="monotone"
@@ -395,8 +417,8 @@ export default function MainDashboard() {
             </div>
           </div>
 
-          <div className="lg:col-span-4 flex flex-col gap-6">
-            <div className="rounded-[1.75rem] border border-outline-variant/10 bg-surface-container-lowest p-6 shadow-sm md:p-8">
+          <div className="flex w-full flex-col gap-6 lg:col-span-4">
+            <div className="w-full rounded-[1.75rem] border border-outline-variant/10 bg-surface-container-lowest p-6 shadow-sm sm:p-8">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-[0.22em] text-on-surface-variant">
@@ -439,7 +461,7 @@ export default function MainDashboard() {
               </div>
             </div>
 
-            <div className="rounded-[1.75rem] bg-secondary-container p-6 md:p-8">
+            <div className="w-full rounded-[1.75rem] bg-secondary-container p-6 sm:p-8">
               <p className="text-xs font-bold uppercase tracking-[0.22em] text-on-secondary-container">
                 Data Export
               </p>
@@ -462,7 +484,7 @@ export default function MainDashboard() {
 
         <section
           id="history"
-          className="mt-10 rounded-[1.75rem] border border-outline-variant/10 bg-surface-container-lowest shadow-sm"
+          className="mt-10 w-full rounded-[1.75rem] border border-outline-variant/10 bg-surface-container-lowest shadow-sm"
         >
           <div className="flex items-center justify-between gap-4 border-b border-outline-variant/10 p-6 md:p-8">
             <div>
@@ -491,22 +513,25 @@ export default function MainDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/10">
-                {[...displayData].reverse().slice(0, 10).map((row) => (
-                  <tr
-                    key={row.ts}
-                    className="transition-colors hover:bg-surface-container-low/50"
-                  >
-                    <td className="px-6 py-4 text-xs font-mono font-medium text-on-surface">
-                      {new Date(row.ts).toLocaleString()}
-                    </td>
-                    <td className="px-6 py-4 text-xs font-bold text-primary">
-                      {row.distanceLabel}
-                    </td>
-                    <td className="px-6 py-4 text-xs font-bold text-primary">
-                      {row.tideLabel}
-                    </td>
-                  </tr>
-                ))}
+                {[...displayData]
+                  .reverse()
+                  .slice(0, 10)
+                  .map((row) => (
+                    <tr
+                      key={row.ts}
+                      className="transition-colors hover:bg-surface-container-low/50"
+                    >
+                      <td className="px-6 py-4 text-xs font-mono font-medium text-on-surface">
+                        {new Date(row.ts).toLocaleString()}
+                      </td>
+                      <td className="px-6 py-4 text-xs font-bold text-primary">
+                        {row.distanceLabel}
+                      </td>
+                      <td className="px-6 py-4 text-xs font-bold text-primary">
+                        {row.tideLabel}
+                      </td>
+                    </tr>
+                  ))}
                 {displayData.length === 0 && (
                   <tr>
                     <td
@@ -524,30 +549,34 @@ export default function MainDashboard() {
 
         <section
           id="alerts"
-          className="mt-10 rounded-[1.75rem] border border-outline-variant/10 bg-surface-container-lowest p-6 shadow-sm md:p-8"
+          className="mt-10 w-full rounded-[1.75rem] border border-outline-variant/10 bg-surface-container-lowest p-6 shadow-sm sm:p-8"
         >
           <p className="text-xs font-bold uppercase tracking-[0.22em] text-on-surface-variant">
             Activity Stream
           </p>
           <div className="mt-6 space-y-4">
-            {[...displayData].reverse().slice(0, 5).map((row) => (
-              <div
-                key={row.ts}
-                className="rounded-2xl bg-surface-container-low px-4 py-4"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <StatusPill>Reading</StatusPill>
-                    <p className="text-sm font-bold text-on-surface">
-                      New telemetry received: {row.tideLabel}m (Dist: {row.distanceLabel}cm)
-                    </p>
+            {[...displayData]
+              .reverse()
+              .slice(0, 5)
+              .map((row) => (
+                <div
+                  key={row.ts}
+                  className="rounded-2xl bg-surface-container-low px-4 py-4"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <StatusPill>Reading</StatusPill>
+                      <p className="text-sm font-bold text-on-surface">
+                        New telemetry received: {row.tideLabel}m (Dist:{" "}
+                        {row.distanceLabel}cm)
+                      </p>
+                    </div>
+                    <span className="text-xs font-bold uppercase tracking-[0.22em] text-on-surface-variant">
+                      {new Date(row.ts).toLocaleTimeString()}
+                    </span>
                   </div>
-                  <span className="text-xs font-bold uppercase tracking-[0.22em] text-on-surface-variant">
-                    {new Date(row.ts).toLocaleTimeString()}
-                  </span>
                 </div>
-              </div>
-            ))}
+              ))}
 
             <div className="rounded-2xl bg-surface-container-low px-4 py-4 opacity-60">
               <div className="flex items-center justify-between">
