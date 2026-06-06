@@ -6,7 +6,7 @@ import logger from "firebase-functions/logger";
 setGlobalOptions({ region: "us-central1" });
 
 export const getThingsBoardToken = onRequest(
-  { secrets: ["THINGSBOARD_USERNAME", "THINGSBOARD_PASSWORD"] },
+  { secrets: ["THINGSBOARD_USERNAME", "THINGSBOARD_PASSWORD", "THINGSBOARD_DEVICE_ID"] },
   async (req, res) => {
     // Enable CORS
     res.set("Access-Control-Allow-Origin", "*");
@@ -25,9 +25,10 @@ export const getThingsBoardToken = onRequest(
     const host = process.env.VITE_THINGSBOARD_HOST || "thingsboard.cloud";
     const username = process.env.THINGSBOARD_USERNAME;
     const password = process.env.THINGSBOARD_PASSWORD;
+    const deviceId = process.env.THINGSBOARD_DEVICE_ID;
 
-    if (!username || !password) {
-      logger.error("ThingsBoard credentials not set in environment");
+    if (!username || !password || !deviceId) {
+      logger.error("ThingsBoard credentials or Device ID not set in secrets");
       res.status(500).json({ error: "Server configuration error" });
       return;
     }
@@ -47,7 +48,10 @@ export const getThingsBoardToken = onRequest(
       }
 
       const data = await response.json();
-      res.status(200).json({ token: data.token });
+      res.status(200).json({ 
+        token: data.token,
+        deviceId: deviceId
+      });
     } catch (error) {
       logger.error("Error connecting to ThingsBoard", error);
       res.status(500).json({ error: "Internal server error" });

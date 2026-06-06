@@ -168,7 +168,7 @@ export default function MainDashboard() {
     if (displayData.length === 0) return;
     const headers = ["Timestamp", "Tide Level (m)", "Sensor Distance (cm)"];
     const rows = displayData.map((d) => [
-      new Date(d.ts).toLocaleString(),
+      `${new Date(d.ts).toLocaleDateString()} ${new Date(d.ts).toLocaleTimeString()}`,
       d.tideLabel,
       d.distanceLabel,
     ]);

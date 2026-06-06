@@ -11,7 +11,7 @@ const ThingsBoardContext = createContext();
 
 const TB_HOST = import.meta.env.VITE_THINGSBOARD_HOST || "thingsboard.cloud";
 const TB_WS_URL = `wss://${TB_HOST}/api/ws/plugins/telemetry`;
-const TB_REST_URL = `https://${TB_HOST}/api`;
+const FIREBASE_FUNCTION_URL = import.meta.env.VITE_FIREBASE_FUNCTION_URL;
 
 export function ThingsBoardProvider({ children }) {
   const [telemetry, setTelemetry] = useState({});
@@ -23,9 +23,9 @@ export function ThingsBoardProvider({ children }) {
 
   const ws = useRef(null);
   const token = useRef(null);
+  const deviceIdRef = useRef(null);
   const cmdIdCounter = useRef(1);
 
-  // 1. Declare subscribeToDevice first (or use function declaration)
   const subscribeToDevice = useCallback((entityId, entityType = "DEVICE") => {
     if (!ws.current || ws.current.readyState !== WebSocket.OPEN) return;
 
@@ -55,7 +55,6 @@ export function ThingsBoardProvider({ children }) {
     ws.current.send(JSON.stringify(subscribeCmd));
   }, []);
 
-  // 2. Declare connectWebSocket second
   const connectWebSocket = useCallback(() => {
     if (!token.current) return;
 
@@ -68,20 +67,16 @@ export function ThingsBoardProvider({ children }) {
       setError(null);
       console.log("ThingsBoard WebSocket Connected");
 
-      const deviceId = import.meta.env.VITE_THINGSBOARD_DEVICE_ID;
-      if (deviceId) {
-        subscribeToDevice(deviceId);
+      if (deviceIdRef.current) {
+        subscribeToDevice(deviceIdRef.current);
       }
     };
 
     ws.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      
-      // Handle both telemetry and attribute updates
       if (data.data) {
         setIsLoading(false);
-        // ThingsBoard Telemetry API returns 'subscriptionId' corresponding to 'cmdId'
-        const isAttrUpdate = data.subscriptionId % 2 === 0; // Based on our counter logic
+        const isAttrUpdate = data.subscriptionId % 2 === 0;
 
         if (isAttrUpdate) {
           const flattenedAttrs = {};
@@ -119,44 +114,40 @@ export function ThingsBoardProvider({ children }) {
     };
   }, [subscribeToDevice]);
 
-  // 3. Declare login third
-  const login = useCallback(async (username, password) => {
+  const login = useCallback(async () => {
+    if (!FIREBASE_FUNCTION_URL) {
+      console.warn("TB: FIREBASE_FUNCTION_URL not defined. Skipping connection.");
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
-    console.log("TB: Attempting login to", TB_REST_URL);
+    console.log("TB: Requesting session token from backend...");
     try {
-      const response = await fetch(`${TB_REST_URL}/auth/login`, {
+      const response = await fetch(FIREBASE_FUNCTION_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
       });
 
       if (!response.ok) {
         setIsLoading(false);
-        const errorData = await response.text();
-        console.error("TB: Login failed status:", response.status, "Body:", errorData);
-        throw new Error(`ThingsBoard login failed: ${response.status}`);
+        throw new Error(`Token request failed: ${response.status}`);
       }
 
       const data = await response.json();
-      console.log("TB: Login successful");
       token.current = data.token;
+      deviceIdRef.current = data.deviceId;
       connectWebSocket();
     } catch (err) {
       setIsLoading(false);
       setError(err.message);
-      console.error("TB: Connection process failed:", err);
+      console.error("TB: Backend connection failed:", err);
     }
   }, [connectWebSocket]);
 
-  // Auto-login on mount (enables public telemetry on landing page)
   useEffect(() => {
-    const tbUser = import.meta.env.VITE_THINGSBOARD_USERNAME;
-    const tbPass = import.meta.env.VITE_THINGSBOARD_PASSWORD;
-    
-    if (tbUser && tbPass && !token.current) {
-      login(tbUser, tbPass);
-    } else {
-      setIsLoading(false);
+    if (!token.current) {
+      login();
     }
 
     return () => {
