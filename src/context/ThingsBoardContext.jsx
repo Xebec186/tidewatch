@@ -31,7 +31,7 @@ export function ThingsBoardProvider({ children }) {
 
     const tsCmdId = cmdIdCounter.current++;
     const attrCmdId = cmdIdCounter.current++;
-    
+
     const subscribeCmd = {
       tsSubCmds: [
         {
@@ -80,7 +80,7 @@ export function ThingsBoardProvider({ children }) {
 
         if (isAttrUpdate) {
           const flattenedAttrs = {};
-          Object.keys(data.data).forEach(key => {
+          Object.keys(data.data).forEach((key) => {
             flattenedAttrs[key] = data.data[key][0][1];
           });
           setAttributes((prev) => ({
@@ -116,7 +116,9 @@ export function ThingsBoardProvider({ children }) {
 
   const login = useCallback(async () => {
     if (!FIREBASE_FUNCTION_URL) {
-      console.warn("TB: FIREBASE_FUNCTION_URL not defined. Skipping connection.");
+      console.warn(
+        "TB: FIREBASE_FUNCTION_URL not defined. Skipping connection.",
+      );
       setIsLoading(false);
       return;
     }

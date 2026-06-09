@@ -2,7 +2,7 @@ import { onRequest } from "firebase-functions/v2/https";
 import { setGlobalOptions } from "firebase-functions/v2";
 // import { getFirestore } from "firebase-admin/firestore";
 import { initializeApp } from "firebase-admin/app";
-import logger from "firebase-functions/logger";
+import { error } from "firebase-functions/logger";
 
 initializeApp();
 // const db = getFirestore();
@@ -20,12 +20,10 @@ export const getThingsBoardToken = onRequest(
       "THINGSBOARD_PASSWORD",
       "THINGSBOARD_DEVICE_ID",
     ],
+    cors: true, // Let Firebase handle CORS automatically
   },
   async (req, res) => {
-    res.set("Access-Control-Allow-Origin", "*");
     if (req.method === "OPTIONS") {
-      res.set("Access-Control-Allow-Methods", "POST");
-      res.set("Access-Control-Allow-Headers", "Content-Type");
       res.status(204).send("");
       return;
     }
@@ -41,7 +39,7 @@ export const getThingsBoardToken = onRequest(
     const deviceId = process.env.THINGSBOARD_DEVICE_ID;
 
     if (!username || !password || !deviceId) {
-      logger.error("ThingsBoard credentials or Device ID not set in secrets");
+      error("ThingsBoard credentials or Device ID not set in secrets");
       res.status(500).json({ error: "Server configuration error" });
       return;
     }
@@ -61,7 +59,7 @@ export const getThingsBoardToken = onRequest(
       const data = await response.json();
       res.status(200).json({ token: data.token, deviceId });
     } catch (error) {
-      logger.error("Error connecting to ThingsBoard", error);
+      error("Error connecting to ThingsBoard", error);
       res.status(500).json({ error: "Internal server error" });
     }
   },
@@ -79,7 +77,7 @@ export const getThingsBoardToken = onRequest(
 //   }
 
 //   const alarmData = req.body;
-//   logger.info("Received Alarm from ThingsBoard:", alarmData);
+//   info("Received Alarm from ThingsBoard:", alarmData);
 
 //   // Expected payload structure from TB Rule Engine:
 //   // {
@@ -104,7 +102,7 @@ export const getThingsBoardToken = onRequest(
 
 //     res.status(200).send("Notification stored");
 //   } catch (error) {
-//     logger.error("Error storing notification:", error);
+//     error("Error storing notification:", error);
 //     res.status(500).send("Internal Server Error");
 //   }
 // });
