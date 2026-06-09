@@ -33,7 +33,7 @@ export const getThingsBoardToken = onRequest(
       return;
     }
 
-    const host = process.env.VITE_THINGSBOARD_HOST || "thingsboard.cloud";
+    const host = "thingsboard.cloud";
     const username = process.env.THINGSBOARD_USERNAME;
     const password = process.env.THINGSBOARD_PASSWORD;
     const deviceId = process.env.THINGSBOARD_DEVICE_ID;
