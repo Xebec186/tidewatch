@@ -75,11 +75,11 @@ export default function DashboardNavbar({ onNotificationToggle }) {
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-on-primary shadow-lg shadow-primary/10">
             <LuWaves size={20} />
           </div>
-          <div>
-            <p className="text-lg font-extrabold tracking-tight text-primary">
+          <div className="min-w-0">
+            <p className="text-lg font-extrabold tracking-tight text-primary leading-tight">
               TideWatch
             </p>
-            <p className="text-[10px] uppercase tracking-[0.22em] text-on-surface-variant">
+            <p className="hidden xs:block text-[10px] uppercase tracking-[0.22em] text-on-surface-variant truncate">
               Live Monitor
             </p>
           </div>
