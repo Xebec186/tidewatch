@@ -11,7 +11,6 @@ export default function Signup() {
   const { signup } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [role, setRole] = useState("regular");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -34,7 +33,6 @@ export default function Signup() {
     try {
       await signup(form.email, form.password, {
         fullName: form.fullName,
-        role: role,
       });
       navigate("/dashboard");
     } catch (err) {
@@ -58,8 +56,7 @@ export default function Signup() {
               Create an account
             </h2>
             <p className="text-sm text-on-surface-variant">
-              Join TideWatch to monitor tide conditions, receive alerts, and
-              keep the system running smoothly.
+              Join TideWatch to monitor tide conditions and receive real-time updates.
             </p>
           </div>
 
@@ -111,51 +108,6 @@ export default function Signup() {
                   placeholder="someone@example.com"
                   className="w-full rounded-xl border-none bg-surface-container-low py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/40 focus:ring-2 focus:ring-primary focus:outline-none"
                 />
-              </div>
-            </div>
-
-            <div>
-              <label className="mb-2 ml-1 block text-xs font-bold uppercase tracking-widest text-on-surface-variant">
-                User Role
-              </label>
-
-              <div className="flex rounded-xl bg-surface-container-low p-1">
-                <button
-                  type="button"
-                  onClick={() => setRole("regular")}
-                  className={`cursor-pointer flex-1 rounded-lg px-3 py-2.5 text-xs font-bold transition-all ${
-                    role === "regular"
-                      ? "bg-surface-container-lowest text-primary shadow-sm"
-                      : "text-outline/60 hover:text-on-surface-variant"
-                  }`}
-                >
-                  Regular User
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRole("technical")}
-                  className={`cursor-pointer flex-1 rounded-lg px-3 py-2.5 text-xs font-bold transition-all ${
-                    role === "technical"
-                      ? "bg-surface-container-lowest text-primary shadow-sm"
-                      : "text-outline/60 hover:text-on-surface-variant"
-                  }`}
-                >
-                  Technical User
-                </button>
-              </div>
-
-              <div className="mt-3 rounded-xl border border-outline-variant/30 bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
-                {role === "regular" ? (
-                  <p>
-                    Regular users mainly view tide readings, receive alerts, and
-                    stay informed about water-level changes.
-                  </p>
-                ) : (
-                  <p>
-                    Technical users manage device settings, thresholds,
-                    diagnostics, and system monitoring for TideWatch.
-                  </p>
-                )}
               </div>
             </div>
 

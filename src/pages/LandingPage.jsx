@@ -1,11 +1,33 @@
 import { Link } from "react-router-dom";
-import { LuArrowRight, LuBellRing, LuBadgeInfo } from "react-icons/lu";
-import { SiArduino } from "react-icons/si";
+import { LuArrowRight, LuWaves, LuBadgeInfo } from "react-icons/lu";
+import { MdOutlineSensors } from "react-icons/md";
 import { features } from "../data/features";
 import { stats } from "../data/stats";
 import { audience } from "../data/audience";
+import { useTelemetry } from "../context/ThingsBoardContext";
 
 export default function LandingPage() {
+  const { telemetry, attributes, isConnected, latestTs, isLoading } =
+    useTelemetry();
+
+  // Prioritize ThingsBoard's official 'active' attribute, fallback to recent telemetry
+  const isDeviceActive =
+    isConnected &&
+    (attributes.active === true ||
+      (latestTs && Date.now() - latestTs < 600000));
+
+  const getLatest = (key, fallback = "--") => {
+    if (telemetry[key] && telemetry[key].length > 0) {
+      return telemetry[key][0][1];
+    }
+    return fallback;
+  };
+
+  const currentTideRaw = getLatest("tide_m");
+  const currentTide =
+    currentTideRaw !== "--" && !isNaN(parseFloat(currentTideRaw))
+      ? parseFloat(currentTideRaw).toFixed(2)
+      : "--";
   return (
     <div className="min-h-screen bg-surface text-on-surface font-manrope selection:bg-primary-container selection:text-on-primary-container">
       <main className="relative overflow-hidden">
@@ -13,11 +35,22 @@ export default function LandingPage() {
         <div className="pointer-events-none absolute -top-24 -right-24 h-96 w-96 rounded-full bg-primary/5 blur-3xl" />
         <div className="pointer-events-none absolute top-1/2 -left-48 h-96 w-96 rounded-full bg-tertiary/5 blur-3xl" />
 
-        <section className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-14 px-6 pb-24 pt-10 lg:grid-cols-12">
+        <section className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-14 px-6 pb-24 pt-8 lg:grid-cols-12">
           <div className="lg:col-span-7">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-secondary-container px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-on-secondary-fixed-variant">
-              <span className="h-2 w-2 rounded-full bg-primary" />
-              System status: active
+            <div
+              className={`mb-6 inline-flex items-center gap-2 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] ${isLoading ? "bg-surface-container-highest text-on-surface-variant" : isDeviceActive ? "bg-secondary-container text-on-secondary-fixed-variant" : "bg-error-container text-on-error-container"}`}
+            >
+              <span
+                className={`h-2 w-2 rounded-full ${isLoading ? "bg-on-surface-variant/30 animate-pulse" : isDeviceActive ? "bg-primary animate-pulse" : "bg-error"}`}
+              />
+              System status:{" "}
+              {isLoading
+                ? "checking..."
+                : isDeviceActive
+                  ? "active"
+                  : isConnected
+                    ? "standby"
+                    : "offline"}
             </div>
 
             <h1 className="max-w-3xl text-4xl font-extrabold tracking-tight text-primary md:text-6xl lg:text-7xl">
@@ -26,8 +59,8 @@ export default function LandingPage() {
 
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-on-surface-variant md:text-xl">
               TideWatch is a low-cost tide gauge system built to measure water
-              levels, support alert delivery, and help communities, schools, and
-              technical teams respond faster to changing coastal conditions.
+              levels and help coastal teams respond faster to changing
+              conditions using real-time ultrasonic sensing.
             </p>
 
             <div className="mt-10 flex md:flex-wrap gap-4">
@@ -73,21 +106,27 @@ export default function LandingPage() {
                     </p>
                     <div className="mt-2 flex items-end gap-2">
                       <span className="text-5xl font-black tracking-tight text-primary">
-                        2.84
+                        {currentTide}
                       </span>
                       <span className="pb-1 text-xl font-bold text-on-surface-variant">
                         m
                       </span>
                     </div>
                   </div>
-                  <div className="rounded-full bg-tertiary-container px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-on-tertiary-container">
-                    Rising
+                  <div
+                    className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] ${isDeviceActive ? "bg-tertiary-container text-on-tertiary-container" : "bg-error-container text-on-error-container"}`}
+                  >
+                    {isDeviceActive
+                      ? "Live Stream"
+                      : isConnected
+                        ? "Standby"
+                        : "Station Offline"}
                   </div>
                 </div>
 
                 <div className="relative h-28 overflow-hidden rounded-2xl bg-surface-container-low">
                   <svg
-                    className="absolute inset-0 h-full w-full"
+                    className={`absolute inset-0 h-full w-full ${isDeviceActive ? "animate-pulse" : ""}`}
                     viewBox="0 0 400 100"
                     preserveAspectRatio="none"
                     aria-hidden="true"
@@ -124,25 +163,33 @@ export default function LandingPage() {
               </div>
 
               <div className="rounded-2xl border border-outline-variant/10 bg-surface-container-lowest p-6 shadow-sm">
-                <LuBellRing className="mb-4 text-primary" size={22} />
+                <LuWaves className="mb-4 text-primary" size={22} />
                 <p className="text-xs font-bold uppercase tracking-[0.22em] text-on-surface-variant">
-                  Alert state
+                  Monitoring
                 </p>
-                <p className="mt-2 text-2xl font-black text-primary">Stable</p>
+                <p
+                  className={`mt-2 text-2xl font-black ${isDeviceActive ? "text-primary" : "text-on-surface-variant"}`}
+                >
+                  {isDeviceActive ? "Active" : "---"}
+                </p>
               </div>
 
               <div className="rounded-2xl border border-outline-variant/10 bg-surface-container-lowest p-6 shadow-sm">
-                <SiArduino className="mb-4 text-primary" size={22} />
+                <MdOutlineSensors className="mb-4 text-primary" size={22} />
                 <p className="text-xs font-bold uppercase tracking-[0.22em] text-on-surface-variant">
                   Device mode
                 </p>
-                <p className="mt-2 text-2xl font-black text-primary">Online</p>
+                <p
+                  className={`mt-2 text-2xl font-black ${isDeviceActive ? "text-primary" : "text-error"}`}
+                >
+                  {isDeviceActive ? "Online" : "Offline"}
+                </p>
               </div>
             </div>
           </div>
         </section>
 
-        <section id="features" className="bg-surface-container-low py-12">
+        <section id="features" className="bg-surface-container-low py-25">
           <div className="mx-auto max-w-7xl px-6">
             <div className="mb-16 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
               <div className="max-w-3xl">
@@ -194,15 +241,15 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start">
             <div className="lg:col-span-5">
               <p className="text-sm font-bold uppercase tracking-[0.24em] text-on-surface-variant">
-                User roles
+                Experience
               </p>
               <h2 className="mt-3 text-4xl font-extrabold tracking-tight text-primary">
-                Two user types, one system.
+                A unified view for everyone.
               </h2>
               <p className="mt-5 max-w-xl text-on-surface-variant">
-                This keeps the interface simple for people who just need tide
-                updates, while still giving administrators the tools to manage
-                the device and its alert logic.
+                Whether you are a coastal resident checking the daily tide or a
+                technician monitoring sensor performance, TideWatch provides all
+                the critical data in one powerful, real-time dashboard.
               </p>
             </div>
 
@@ -227,10 +274,10 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="cta" className="px-6 pb-32 pt-6">
-          <div className="relative mx-auto max-w-5xl overflow-hidden rounded-4xl bg-primary">
+        <section id="cta" className="px-1 md:px-6 pb-42 pt-25">
+          <div className="relative mx-auto max-w-full sm:max-w-5xl overflow-hidden rounded-4xl bg-primary">
             <div className="absolute inset-0 bg-linear-to-br from-primary via-primary to-tertiary opacity-95" />
-            <div className="relative z-10 px-8 py-16 text-center md:px-16 md:py-24">
+            <div className="relative z-10 px-5 py-8 text-center md:px-16 md:py-24">
               <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-on-primary/80">
                 Ready to deploy
               </p>
@@ -239,7 +286,7 @@ export default function LandingPage() {
               </h2>
               <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-on-primary/80 md:text-base">
                 Start with the public landing page, then move into the secure
-                login and signup flow for regular and technical users.
+                login and signup flow.
               </p>
               <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
                 <Link

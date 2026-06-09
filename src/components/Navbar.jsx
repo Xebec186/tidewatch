@@ -10,6 +10,14 @@ export default function Navbar() {
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
+  const scrollToSection = (id) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+    setIsMenuOpen(false);
+  };
+
   return (
     <header
       className={`sticky top-0 z-50 border-b border-outline-variant/20 transition-colors duration-300 ${
@@ -32,24 +40,24 @@ export default function Navbar() {
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
-          <a
-            href="#features"
-            className="text-sm font-medium text-on-surface-variant transition-colors hover:text-primary"
+          <button
+            onClick={() => scrollToSection("features")}
+            className="cursor-pointer text-sm font-medium text-on-surface-variant transition-colors hover:text-primary"
           >
             Features
-          </a>
-          <a
-            href="#audience"
-            className="text-sm font-medium text-on-surface-variant transition-colors hover:text-primary"
+          </button>
+          <button
+            onClick={() => scrollToSection("audience")}
+            className="cursor-pointer text-sm font-medium text-on-surface-variant transition-colors hover:text-primary"
           >
             Users
-          </a>
-          <a
-            href="#cta"
-            className="text-sm font-medium text-on-surface-variant transition-colors hover:text-primary"
+          </button>
+          <button
+            onClick={() => scrollToSection("cta")}
+            className="cursor-pointer text-sm font-medium text-on-surface-variant transition-colors hover:text-primary"
           >
             Get Started
-          </a>
+          </button>
         </nav>
 
         <div className="flex items-center gap-3">
@@ -101,27 +109,24 @@ export default function Navbar() {
       >
         <div className="flex flex-col gap-4 p-6">
           <nav className="flex flex-col gap-4">
-            <a
-              href="#features"
-              onClick={() => setIsMenuOpen(false)}
-              className="text-base font-semibold text-on-surface-variant transition-colors hover:text-primary"
+            <button
+              onClick={() => scrollToSection("features")}
+              className="text-left text-base font-semibold text-on-surface-variant transition-colors hover:text-primary"
             >
               Features
-            </a>
-            <a
-              href="#audience"
-              onClick={() => setIsMenuOpen(false)}
-              className="text-base font-semibold text-on-surface-variant transition-colors hover:text-primary"
+            </button>
+            <button
+              onClick={() => scrollToSection("audience")}
+              className="text-left text-base font-semibold text-on-surface-variant transition-colors hover:text-primary"
             >
               Users
-            </a>
-            <a
-              href="#cta"
-              onClick={() => setIsMenuOpen(false)}
-              className="text-base font-semibold text-on-surface-variant transition-colors hover:text-primary"
+            </button>
+            <button
+              onClick={() => scrollToSection("cta")}
+              className="text-left text-base font-semibold text-on-surface-variant transition-colors hover:text-primary"
             >
               Get Started
-            </a>
+            </button>
           </nav>
 
           <hr className="border-outline-variant/20" />
